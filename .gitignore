@@ -25,4 +25,3 @@ hs_err_pid*
 /.idea/
 .env
 /target
-.env

@@ -18,18 +18,6 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Plugin versions -->
-        <maven.shade>3.2.2</maven.shade>
-        <maven.clean>3.1.0</maven.clean>
-        <maven.resources>3.1.0</maven.resources>
-        <maven.compiler>3.8.1</maven.compiler>
-        <maven.surefire>2.22.2</maven.surefire>
-        <maven.jar>3.2.0</maven.jar>
-        <maven.install>3.0.0-M1</maven.install>
-        <java-jwt.version>4.0.0</java-jwt.version>
-        <logger.version>2.19.0</logger.version>
-        <telegrambots.version>6.1.0</telegrambots.version>
-        <httpmime.version>4.5.13</httpmime.version>
     </properties>
 
     <dependencies>
@@ -114,23 +102,6 @@
             <groupId>com.slack.api</groupId>
             <artifactId>slack-api-client</artifactId>
             <version>1.25.1</version>
-        </dependency>
-
-        <!-- Logger -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${logger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${logger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${logger.version}</version>
         </dependency>
 
     </dependencies>
