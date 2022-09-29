@@ -47,11 +47,14 @@ public class MentorHelperBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage();
             message.setChatId(update.getMessage().getChatId());
 
-            String answer = switch (update.getMessage().getText()) {
-                case "/start" -> GREETINGS;
-                default -> "type '/start' for beginning";
-            };
-            message.setText(answer);
+            String messageText = update.getMessage().getText() != null ? update.getMessage().getText() : "";
+            switch (messageText) {
+                case "/start":
+                    message.setText(GREETINGS);
+                    break;
+                default:
+                    message.setText("I don't understand you");
+            }
             try {
                 execute(message);
             } catch (TelegramApiException e) {
