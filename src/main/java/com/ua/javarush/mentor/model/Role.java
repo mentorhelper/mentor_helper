@@ -1,4 +1,4 @@
-package com.ua.javaruh.mentor.model;
+package com.ua.javarush.mentor.model;
 
 public class Role {
     private final long id;

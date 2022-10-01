@@ -1,6 +1,6 @@
-package com.ua.javaruh.mentor.controller;
+package com.ua.javarush.mentor.controller;
 
-import com.ua.javaruh.mentor.model.Role;
+import com.ua.javarush.mentor.model.Role;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
