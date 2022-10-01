@@ -5,6 +5,29 @@ databaseChangeLog:
       author: mckeydonelly
       changes:
         - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "Role id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: integer
+                  remarks: "Role name"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 2
+      author: mckeydonelly
+      changes:
+        - createTable:
             tableName: user
             columns:
               - column:
@@ -74,29 +97,8 @@ databaseChangeLog:
                   remarks: "User role id"
                   constraints:
                     nullable: false
-  - changeSet:
-      id: 2
-      author: mckeydonelly
-      changes:
-        - createTable:
-            tableName: role
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  remarks: "Role id"
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-                    unique: true
-              - column:
-                  name: name
-                  type: integer
-                  remarks: "Role name"
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-                    unique: true
+                    foreignKeyName: fk_role_id
+                    references: role(id)
   - changeSet:
       id: 3
       author: mckeydonelly
@@ -169,6 +171,8 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
                     unique: true
+                    foreignKeyName: fk_user_id
+                    references: user(id)
               - column:
                   name: group_id
                   type: integer
@@ -176,6 +180,8 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+                    foreignKeyName: fk_group_id
+                    references: group(id)
   - changeSet:
       id: 5
       author: mckeydonelly
@@ -190,6 +196,8 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+                    foreignKeyName: fk_group_id
+                    references: group(id)
               - column:
                   name: number_of_day
                   type: integer
@@ -211,6 +219,8 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+                    foreignKeyName: fk_role_id
+                    references: role(id)
               - column:
                   name: permission
                   type: varchar(200)

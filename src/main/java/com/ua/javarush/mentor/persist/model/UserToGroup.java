@@ -3,11 +3,12 @@ package com.ua.javarush.mentor.persist.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "user_to_group")
 @Data
-public class UserToGroup {
+public class UserToGroup implements Serializable {
     @Id
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true, nullable = false)
