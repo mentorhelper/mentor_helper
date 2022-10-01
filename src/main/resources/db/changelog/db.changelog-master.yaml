@@ -1,0 +1,219 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Unique user id"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(100)
+                  remarks: "User name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(100)
+                  remarks: "User last name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: country
+                  type: varchar(20)
+                  remarks: "User country"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registered_at
+                  type: timestamptz
+                  remarks: "User country"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_id
+                  type: integer
+                  remarks: "User telegram identifier"
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: telegram_nickname
+                  type: varchar(200)
+                  remarks: "User telegram nickname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: salary_per_hour
+                  type: integer
+                  remarks: "User salary per hour"
+              - column:
+                  name: salary_currency
+                  type: varchar(20)
+                  remarks: "User salary currency"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: secret_phrase
+                  type: varchar(50)
+                  remarks: "User salary currency"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: integer
+                  remarks: "User role id"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "Role id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: integer
+                  remarks: "Role name"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 3
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: group
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: varchar(100)
+                  remarks: "Group name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_created
+                  type: timestamptz
+                  remarks: "Created date"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_started
+                  type: timestamptz
+                  remarks: "Started date"
+              - column:
+                  name: date_finished
+                  type: timestamptz
+                  remarks: "Finished date"
+              - column:
+                  name: slack_url
+                  type: varchar(200)
+                  remarks: "Group slack url"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: students_count_on_start
+                  type: integer
+                  remarks: "Count users on start"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: students_count_on_end
+                  type: integer
+                  remarks: "Count users on end"
+              - column:
+                  name: hours_per_lecture
+                  type: integer
+                  remarks: "Hours per lecture"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 4
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: user_to_group
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: "User id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: group_id
+                  type: integer
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+  - changeSet:
+      id: 5
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: group_to_weekend
+            columns:
+              - column:
+                  name: group_id
+                  type: integer
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: number_of_day
+                  type: integer
+                  remarks: "Number of week day"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+  - changeSet:
+      id: 6
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: role_to_permission
+            columns:
+              - column:
+                  name: role_id
+                  type: integer
+                  remarks: "Role id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: permission
+                  type: varchar(200)
+                  remarks: "Permission name"
+                  constraints:
+                    nullable: false
