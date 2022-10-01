@@ -10,6 +10,9 @@ import java.io.Serializable;
 @Data
 public class UserToGroup implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Long id;
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true, nullable = false)
     private User userId;

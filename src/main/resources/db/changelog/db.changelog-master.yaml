@@ -164,6 +164,13 @@ databaseChangeLog:
             tableName: user_to_group
             columns:
               - column:
+                  name: id
+                  type: bigint
+                  remarks: "Entry id"
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: user_id
                   type: bigint
                   remarks: "User id"
@@ -190,6 +197,13 @@ databaseChangeLog:
             tableName: group_to_weekend
             columns:
               - column:
+                  name: id
+                  type: bigint
+                  remarks: "Entry id"
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: group_id
                   type: integer
                   remarks: "Group id"
@@ -212,6 +226,13 @@ databaseChangeLog:
         - createTable:
             tableName: role_to_permission
             columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Entry id"
+                  constraints:
+                    nullable: false
+                    unique: true
               - column:
                   name: role_id
                   type: integer
