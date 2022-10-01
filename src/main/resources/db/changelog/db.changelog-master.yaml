@@ -17,7 +17,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: name
-                  type: integer
+                  type: varchar(200)
                   remarks: "Role name"
                   constraints:
                     primaryKey: true
@@ -164,13 +164,6 @@ databaseChangeLog:
             tableName: user_to_group
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  remarks: "Entry id"
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
                   name: user_id
                   type: bigint
                   remarks: "User id"
@@ -178,8 +171,6 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
                     unique: true
-                    foreignKeyName: fk_user_id
-                    references: user(id)
               - column:
                   name: group_id
                   type: integer
@@ -197,21 +188,12 @@ databaseChangeLog:
             tableName: group_to_weekend
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  remarks: "Entry id"
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
                   name: group_id
                   type: integer
                   remarks: "Group id"
                   constraints:
                     primaryKey: true
                     nullable: false
-                    foreignKeyName: fk_group_id
-                    references: group(id)
               - column:
                   name: number_of_day
                   type: integer
@@ -227,21 +209,12 @@ databaseChangeLog:
             tableName: role_to_permission
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  remarks: "Entry id"
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
                   name: role_id
                   type: integer
                   remarks: "Role id"
                   constraints:
                     primaryKey: true
                     nullable: false
-                    foreignKeyName: fk_role_id
-                    references: role(id)
               - column:
                   name: permission
                   type: varchar(200)

@@ -10,11 +10,8 @@ import java.io.Serializable;
 @Data
 public class GroupToWeekend implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
-    private Long id;
-    @JoinColumn(name = "group_id", referencedColumnName = "id", nullable = false)
-    private Group groupId;
+    @Column(name = "group_id", nullable = false)
+    private Integer groupId;
     @Column(name = "number_of_day", nullable = false)
     private Integer numberOfDay;
 }
