@@ -2,6 +2,7 @@ package com.ua.javarush.mentor.controller;
 
 import com.ua.javarush.mentor.command.RoleCommand;
 import com.ua.javarush.mentor.dto.RoleDTO;
+import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.services.RoleService;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<RoleDTO> createNewRole(@RequestBody RoleCommand roleCommand) {
+    @PostMapping("")
+    public ResponseEntity<RoleDTO> createNewRole(@RequestBody RoleCommand roleCommand) throws GeneralException {
         return new ResponseEntity<>(roleService.create(roleCommand), HttpStatus.CREATED);
     }
 
