@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class RoleToPermission implements Serializable {
     @Id
     @Column(name = "ROLE_ID", nullable = false)
-    private Integer roleId;
+    private Long roleId;
     @Column(name = "PERMISSION", length = 200, nullable = false)
     private String permission;
 }

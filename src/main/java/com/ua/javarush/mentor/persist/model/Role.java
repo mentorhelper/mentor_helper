@@ -13,7 +13,7 @@ public class Role implements Serializable {
     @Id
     @Column(name = "ID", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ROLE_SEQ_GENERATOR")
-    private Integer id;
+    private Long id;
     @Column(name = "NAME", length = 200, unique = true, nullable = false)
     private String name;
 }

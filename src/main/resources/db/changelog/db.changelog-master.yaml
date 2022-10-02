@@ -9,7 +9,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   remarks: "Role id"
                   constraints:
                     primaryKey: true
@@ -108,7 +108,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   remarks: "Group id"
                   constraints:
                     primaryKey: true
@@ -189,7 +189,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: group_id
-                  type: integer
+                  type: bigint
                   remarks: "Group id"
                   constraints:
                     primaryKey: true
@@ -210,7 +210,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_id
-                  type: integer
+                  type: bigint
                   remarks: "Role id"
                   constraints:
                     primaryKey: true

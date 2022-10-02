@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RoleToPermissionRepository extends JpaRepository<RoleToPermission, Integer> {
+public interface RoleToPermissionRepository extends JpaRepository<RoleToPermission, Long> {
 }
