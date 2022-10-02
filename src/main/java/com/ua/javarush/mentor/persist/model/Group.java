@@ -9,9 +9,10 @@ import java.util.Date;
 @Entity
 @Table(name = "GROUP")
 @Data
+@SequenceGenerator(name = "GROUP_SEQ_GENERATOR", sequenceName = "GROUP_SEQ", allocationSize = 1)
 public class Group implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "GROUP_SEQ_GENERATOR")
     @Column(name = "ID", nullable = false, unique = true)
     private Long id;
     @Column(name = "NAME", length = 100, nullable = false)

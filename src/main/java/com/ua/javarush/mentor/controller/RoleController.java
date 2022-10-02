@@ -18,6 +18,11 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<RoleDTO> createNewRole(@RequestBody RoleCommand roleCommand) {
+        return new ResponseEntity<>(roleService.create(roleCommand), HttpStatus.CREATED);
+    }
+
     @GetMapping("")
     public Role getAllRole() {
         return null;
@@ -33,11 +38,6 @@ public class RoleController {
     public Role getRolePermission(@PathVariable Long roleId) {
         //find role permission by id and return
         return null;
-    }
-
-    @PostMapping
-    public ResponseEntity<RoleDTO> createNewRole(@RequestBody RoleCommand roleCommand) {
-        return new ResponseEntity<>(roleService.create(roleCommand), HttpStatus.CREATED);
     }
 
     @PostMapping("/{roleId}/permission")

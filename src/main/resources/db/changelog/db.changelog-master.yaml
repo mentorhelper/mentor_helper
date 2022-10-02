@@ -231,4 +231,23 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
-
+  - changeSet:
+      id: 8
+      author: mckeydonelly
+      changes:
+        - createSequence:
+            sequenceName: group_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 9
+      author: mckeydonelly
+      changes:
+        - createSequence:
+            sequenceName: user_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807

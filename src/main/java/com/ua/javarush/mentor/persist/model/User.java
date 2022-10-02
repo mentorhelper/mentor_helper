@@ -9,9 +9,10 @@ import java.util.Date;
 @Entity
 @Table(name = "USER")
 @Data
+@SequenceGenerator(name = "USER_SEQ_GENERATOR", sequenceName = "USER_SEQ", allocationSize = 1)
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "USER_SEQ_GENERATOR")
     @Column(name = "ID", nullable = false)
     private Long id;
     @Column(name = "FIRST_NAME", length = 100, nullable = false)
