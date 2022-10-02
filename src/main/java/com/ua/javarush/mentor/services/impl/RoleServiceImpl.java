@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
@@ -31,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleDTO create(RoleCommand roleCommand) throws GeneralException {
         Role newRole = roleMapper.mapToEntity(roleCommand);
         Role roleFromDB = roleRepository.findByName(newRole.getName()).orElse(null);
-        if (roleFromDB != null) {
+        if (Objects.nonNull(roleFromDB)) {
             throw createGeneralException("Role with name " + newRole.getName() + " already exist", HttpStatus.BAD_REQUEST, Error.ROLE_ALREADY_EXISTS);
         } else {
             log.info("Create new role with name {}" + newRole.getName());
