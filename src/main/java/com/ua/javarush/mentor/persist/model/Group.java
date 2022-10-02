@@ -7,30 +7,30 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "group")
+@Table(name = "GROUP")
 @Data
 public class Group implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", nullable = false, unique = true)
     private Long id;
-    @Column(name = "name", length = 100, nullable = false)
+    @Column(name = "NAME", length = 100, nullable = false)
     private String nickname;
-    @Column(name = "date_created", nullable = false)
+    @Column(name = "DATE_CREATED", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
-    @Column(name = "date_started")
+    @Column(name = "DATE_STARTED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateStarted;
-    @Column(name = "date_finished")
+    @Column(name = "DATE_FINISHED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateRegistered;
-    @Column(name = "slack_url", length = 200, nullable = false)
+    @Column(name = "SLACK_URL", length = 200, nullable = false)
     private String slackUrl;
-    @Column(name = "students_count_on_start", nullable = false)
+    @Column(name = "STUDENTS_COUNT_ON_START", nullable = false)
     private Integer studentCountOnStart;
-    @Column(name = "students_count_on_end")
+    @Column(name = "STUDENTS_COUNT_ON_END")
     private Integer studentsCountOnEnd;
-    @Column(name = "hours_per_lecture", nullable = false)
+    @Column(name = "HOURS_PER_LECTURE", nullable = false)
     private Integer hoursPerLecture;
 }

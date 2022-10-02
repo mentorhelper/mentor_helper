@@ -7,33 +7,33 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "user")
+@Table(name = "USER")
 @Data
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", nullable = false)
     private Long id;
-    @Column(name = "first_name", length = 100, nullable = false)
+    @Column(name = "FIRST_NAME", length = 100, nullable = false)
     private String firstName;
-    @Column(name = "last_name", length = 100, nullable = false)
+    @Column(name = "LAST_NAME", length = 100, nullable = false)
     private String lastName;
-    @Column(name = "country", length = 20, nullable = false)
+    @Column(name = "COUNTRY", length = 20, nullable = false)
     private String country;
-    @Column(name = "registered_at", nullable = false)
+    @Column(name = "REGISTERED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
-    @Column(name = "telegram_id", unique = true, nullable = false)
+    @Column(name = "TELEGRAM_ID", unique = true, nullable = false)
     private Integer telegramId;
-    @Column(name = "telegram_nickname", length = 200, nullable = false)
+    @Column(name = "TELEGRAM_NICKNAME", length = 200, nullable = false)
     private String telegramNickname;
-    @Column(name = "salary_per_hour")
+    @Column(name = "SALARY_PER_HOUR")
     private Integer salaryPerHour;
-    @Column(name = "salary_currency", length = 20, nullable = false)
+    @Column(name = "SALARY_CURRENCY", length = 20, nullable = false)
     private String salaryCurrency;
-    @Column(name = "secret_phrase", length = 50, nullable = false)
+    @Column(name = "SECRET_PHRASE", length = 50, nullable = false)
     private String secretPhrase;
     @OneToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID", nullable = false)
     private Role roleId;
 }

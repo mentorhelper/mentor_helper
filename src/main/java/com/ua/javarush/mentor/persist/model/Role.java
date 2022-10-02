@@ -6,12 +6,14 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "role")
+@Table(name = "ROLE")
 @Data
+@SequenceGenerator(name = "ROLE_SEQ_GENERATOR", sequenceName = "ROLE_SEQ", allocationSize = 1)
 public class Role implements Serializable {
     @Id
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(name = "ID", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "ROLE_SEQ_GENERATOR")
     private Integer id;
-    @Column(name = "name", length = 200, unique = true, nullable = false)
+    @Column(name = "NAME", length = 200, unique = true, nullable = false)
     private String name;
 }

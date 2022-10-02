@@ -6,12 +6,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "role_to_permission")
+@Table(name = "ROLE_TO_PERMISSION")
 @Data
 public class RoleToPermission implements Serializable {
     @Id
-    @Column(name = "role_id", nullable = false)
+    @Column(name = "ROLE_ID", nullable = false)
     private Integer roleId;
-    @Column(name = "permission", length = 200, nullable = false)
+    @Column(name = "PERMISSION", length = 200, nullable = false)
     private String permission;
 }

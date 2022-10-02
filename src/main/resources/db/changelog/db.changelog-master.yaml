@@ -221,3 +221,14 @@ databaseChangeLog:
                   remarks: "Permission name"
                   constraints:
                     nullable: false
+  - changeSet:
+      id: 7
+      author: anton_kupreychik
+      changes:
+        - createSequence:
+            sequenceName: role_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+

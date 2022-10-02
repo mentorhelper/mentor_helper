@@ -6,12 +6,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "group_to_weekend")
+@Table(name = "GROUP_TO_WEEKEND")
 @Data
 public class GroupToWeekend implements Serializable {
     @Id
-    @Column(name = "group_id", nullable = false)
+    @Column(name = "GROUP_ID", nullable = false)
     private Integer groupId;
-    @Column(name = "number_of_day", nullable = false)
+    @Column(name = "NUMBER_OF_DAY", nullable = false)
     private Integer numberOfDay;
 }
