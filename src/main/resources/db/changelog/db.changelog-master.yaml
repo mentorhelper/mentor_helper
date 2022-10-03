@@ -289,13 +289,13 @@ databaseChangeLog:
                   type: varchar(255)
                   remarks: "User telegram firstname"
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
-                  name: telegram_firstname
+                  name: telegram_lastname
                   type: varchar(255)
-                  remarks: "User telegram firstname"
+                  remarks: "User telegram lastname"
                   constraints:
-                    nullable: false
+                    nullable: tru
               - column:
                   name: command
                   type: varchar(255)
