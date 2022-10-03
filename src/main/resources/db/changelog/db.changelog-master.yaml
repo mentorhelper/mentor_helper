@@ -251,3 +251,64 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
+  - changeSet:
+      id: 10
+      author: romamku
+      changes:
+        - createTable:
+            tableName: bot_enter_history
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: attempt_datetime
+                  type: timestamptz
+                  remarks: "Attempt datetime"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_id
+                  type: integer
+                  remarks: "User telegram identifier"
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: telegram_nickname
+                  type: varchar(255)
+                  remarks: "User telegram nickname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_firstname
+                  type: varchar(255)
+                  remarks: "User telegram firstname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_firstname
+                  type: varchar(255)
+                  remarks: "User telegram firstname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: command
+                  type: varchar(255)
+                  remarks: "Completed command"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 11
+      author: romamku
+      changes:
+        - createSequence:
+            sequenceName: bot_enter_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
