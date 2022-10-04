@@ -21,9 +21,9 @@ public class BotEnterHistory implements Serializable {
     private Integer telegramId;
     @Column(name = "TELEGRAM_NICKNAME", length = 200, nullable = false)
     private String telegramNickname;
-    @Column(name = "TELEGRAM_FIRST_NAME", length = 100, nullable = false)
+    @Column(name = "TELEGRAM_FIRSTNAME", length = 100, nullable = false)
     private String firstName;
-    @Column(name = "TELEGRAM_LAST_NAME", length = 100, nullable = false)
+    @Column(name = "TELEGRAM_LASTNAME", length = 100, nullable = false)
     private String lastName;
     @Column(name = "COMMAND", length = 100, nullable = false)
     private String command;
