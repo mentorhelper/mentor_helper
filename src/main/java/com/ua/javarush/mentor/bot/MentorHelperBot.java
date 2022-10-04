@@ -34,7 +34,6 @@ public class MentorHelperBot extends TelegramLongPollingBot {
         return this;
     }
 
-
     @Override
     public String getBotToken() {
         return botToken;
