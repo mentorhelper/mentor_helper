@@ -253,6 +253,222 @@ databaseChangeLog:
             maxValue: 9223372036854775807
   - changeSet:
       id: 10
+      author: danir
+      changes:
+        - createTable:
+            tableName: lection
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "Unique id of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: module_id
+                  type: varchar(500)
+                  remarks: "number of module"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_module_id
+                    references: module(id)
+              - column:
+                  name: name
+                  type: varchar(500)
+                  remarks: "topic of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(5000)
+                  remarks: "description of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_presentation
+                  type: varchar(500)
+                  remarks: "link to presentation"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_lesson
+                  type: varchar(500)
+                  remarks: "link to lesson"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locale
+                  type: varchar(20)
+                  remarks: "language of lecture"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 11
+      author: danir
+      changes:
+        - createTable:
+            tableName: modules
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "id of mentor"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: module_number
+                  type: integer
+                  remarks: "number of module"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lection_count
+                  type: integer
+                  remarks: "quantity of lectures"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  remarks: "name of module"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+                  remarks: "description"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_site
+                  type: varchar(500)
+                  remarks: "link to site"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 12
+      author: danir
+      changes:
+        - createTable:
+            tableName: timetable
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "id of schedule"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: integer
+                  remarks: "id of group"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_scheduleGroup_id
+                    references: scheduleGroup(id)
+              - column:
+                  name: lection_id
+                  type: integer
+                  remarks: "id of lecture"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lection_id
+                    references: lection(id)
+              - column:
+                  name: start_datetime
+                  type: timespamtz
+                  remarks: "date and time of beginning of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: finish_datetime
+                  type: timespamtz
+                  remarks: "date and time of finishing of lecture"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 13
+      author: danir
+      changes:
+        - createTable:
+            tableName: timetable_to_lection_result
+            columns:
+              - column:
+                  name: timetable_id
+                  type: integer
+                  remarks: "mentor's id"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lection_result_id
+                  type: integer
+                  remarks: "number of the day of the week"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 14
+      author: danir
+      changes:
+        - createTable:
+            tableName: lection_result
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  remarks: "id of the result of lection"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lection_id
+                  type: integer
+                  remarks: "id of the group"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: integer
+                  remarks: "id of mentor"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hours_in_lection
+                  type: integer
+                  remarks: "duration of lection(hours)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_user_leading
+                  type: boolean
+                  remarks: "if a user gave a lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: was_at_lection
+                  type: boolean
+                  remarks: "if a mentor was present at a lection"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: other_user_was_on_lection
+                  type: boolean
+                  remarks: "if a second mentor was present at a lection"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: other_user_hours_on_lection
+                  type: boolean
+                  remarks: "how many hours second mentor was present at a lection"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: text
+                  remarks: "comments"
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 15
       author: romamku
       changes:
         - createTable:
@@ -302,13 +518,13 @@ databaseChangeLog:
                   remarks: "Completed command"
                   constraints:
                     nullable: false
-  - changeSet:
-      id: 11
-      author: romamku
-      changes:
-        - createSequence:
-            sequenceName: bot_enter_seq
-            incrementBy: 1
-            startValue: 1
-            minValue: 1
-            maxValue: 9223372036854775807
+      - changeSet:
+          id: 16
+          author: romamku
+          changes:
+            - createSequence:
+                sequenceName: bot_enter_seq
+                incrementBy: 1
+                startValue: 1
+                minValue: 1
+                maxValue: 9223372036854775807
