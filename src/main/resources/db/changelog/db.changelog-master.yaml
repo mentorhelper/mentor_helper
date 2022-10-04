@@ -256,17 +256,58 @@ databaseChangeLog:
       author: danir
       changes:
         - createTable:
-            tableName: lection
+            tableName: module
             columns:
               - column:
                   name: id
-                  type: integer
-                  remarks: "Unique id of lecture"
+                  type: bigint
+                  remarks: "id of mentor"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: module_number
+                  type: bigint
+                  remarks: "number of module"
                   constraints:
                     nullable: false
               - column:
-                  name: module_id
+                  name: lecture_count
+                  type: integer
+                  remarks: "quantity of lectures"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  remarks: "name of module"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+                  remarks: "description"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_site
                   type: varchar(500)
+                  remarks: "link to site"
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: lecture
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Unique id of lecture"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: module_id
+                  type: bigint
                   remarks: "number of module"
                   constraints:
                     nullable: false
@@ -302,51 +343,20 @@ databaseChangeLog:
                   remarks: "language of lecture"
                   constraints:
                     nullable: false
+        - createSequence:
+            sequenceName: module_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+        - createSequence:
+            sequenceName: lecture_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
   - changeSet:
       id: 11
-      author: danir
-      changes:
-        - createTable:
-            tableName: modules
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  remarks: "id of mentor"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: module_number
-                  type: integer
-                  remarks: "number of module"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: lection_count
-                  type: integer
-                  remarks: "quantity of lectures"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(200)
-                  remarks: "name of module"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: description
-                  type: varchar(200)
-                  remarks: "description"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: link_to_site
-                  type: varchar(500)
-                  remarks: "link to site"
-                  constraints:
-                    nullable: false
-  - changeSet:
-      id: 12
       author: danir
       changes:
         - createTable:
@@ -354,87 +364,79 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   remarks: "id of schedule"
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: group_id
-                  type: integer
+                  type: bigint
                   remarks: "id of group"
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_scheduleGroup_id
-                    references: scheduleGroup(id)
+                    foreignKeyName: fk_group_id
+                    references: group(id)
               - column:
-                  name: lection_id
-                  type: integer
+                  name: lecture_id
+                  type: bigint
                   remarks: "id of lecture"
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_lection_id
-                    references: lection(id)
+                    foreignKeyName: fk_lecture_id
+                    references: lecture(id)
               - column:
                   name: start_datetime
-                  type: timespamtz
+                  type: timestamptz
                   remarks: "date and time of beginning of lecture"
                   constraints:
                     nullable: false
               - column:
                   name: finish_datetime
-                  type: timespamtz
+                  type: timestamptz
                   remarks: "date and time of finishing of lecture"
                   constraints:
                     nullable: false
+        - createSequence:
+            sequenceName: timetable_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
   - changeSet:
-      id: 13
+      id: 12
       author: danir
       changes:
         - createTable:
-            tableName: timetable_to_lection_result
-            columns:
-              - column:
-                  name: timetable_id
-                  type: integer
-                  remarks: "mentor's id"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: lection_result_id
-                  type: integer
-                  remarks: "number of the day of the week"
-                  constraints:
-                    nullable: false
-  - changeSet:
-      id: 14
-      author: danir
-      changes:
-        - createTable:
-            tableName: lection_result
+            tableName: lecture_result
             columns:
               - column:
                   name: id
-                  type: integer
-                  remarks: "id of the result of lection"
+                  type: bigint
+                  remarks: "id of the result of lecture"
                   constraints:
+                    primaryKey: true
                     nullable: false
               - column:
-                  name: lection_id
-                  type: integer
+                  name: lecture_id
+                  type: bigint
                   remarks: "id of the group"
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_lecture_id
+                    references: lecture(id)
               - column:
                   name: user_id
-                  type: integer
+                  type: bigint
                   remarks: "id of mentor"
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_user_id
+                    references: user(id)
               - column:
-                  name: hours_in_lection
-                  type: integer
-                  remarks: "duration of lection(hours)"
+                  name: hours_in_lecture
+                  type: bigint
+                  remarks: "duration of lecture(hours)"
                   constraints:
                     nullable: false
               - column:
@@ -444,21 +446,21 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: was_at_lection
+                  name: was_at_lecture
                   type: boolean
-                  remarks: "if a mentor was present at a lection"
+                  remarks: "if a mentor was present at a lecture"
                   constraints:
                     nullable: false
               - column:
-                  name: other_user_was_on_lection
+                  name: other_user_was_on_lecture
                   type: boolean
-                  remarks: "if a second mentor was present at a lection"
+                  remarks: "if a second mentor was present at a lecture"
                   constraints:
                     nullable: false
               - column:
-                  name: other_user_hours_on_lection
+                  name: other_user_hours_on_lecture
                   type: boolean
-                  remarks: "how many hours second mentor was present at a lection"
+                  remarks: "how many hours second mentor was present at a lecture"
                   constraints:
                     nullable: false
               - column:
@@ -467,8 +469,35 @@ databaseChangeLog:
                   remarks: "comments"
                   constraints:
                     nullable: true
+        - createSequence:
+            sequenceName: lecture_result_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+        - createTable:
+            tableName: timetable_to_lecture_result
+            columns:
+              - column:
+                  name: timetable_id
+                  type: bigint
+                  remarks: "mentor's id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_timetable_id
+                    references: timetable(id)
+              - column:
+                  name: lecture_result_id
+                  type: bigint
+                  remarks: "number of the day of the week"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_lecture_result_id
+                    references: lecture_result(id)
   - changeSet:
-      id: 15
+      id: 13
       author: romamku
       changes:
         - createTable:
@@ -518,10 +547,6 @@ databaseChangeLog:
                   remarks: "Completed command"
                   constraints:
                     nullable: false
-  - changeSet:
-      id: 16
-      author: romamku
-      changes:
         - createSequence:
             sequenceName: bot_enter_seq
             incrementBy: 1
