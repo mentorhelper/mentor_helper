@@ -511,20 +511,20 @@ databaseChangeLog:
                   type: varchar(255)
                   remarks: "User telegram lastname"
                   constraints:
-                    nullable: tru
+                    nullable: true
               - column:
                   name: command
                   type: varchar(255)
                   remarks: "Completed command"
                   constraints:
                     nullable: false
-      - changeSet:
-          id: 16
-          author: romamku
-          changes:
-            - createSequence:
-                sequenceName: bot_enter_seq
-                incrementBy: 1
-                startValue: 1
-                minValue: 1
-                maxValue: 9223372036854775807
+  - changeSet:
+      id: 16
+      author: romamku
+      changes:
+        - createSequence:
+            sequenceName: bot_enter_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
