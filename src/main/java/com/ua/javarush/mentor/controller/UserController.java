@@ -4,6 +4,7 @@ import com.ua.javarush.mentor.controller.user.UserPageableRequest;
 import com.ua.javarush.mentor.controller.user.UserPermissionRequest;
 import com.ua.javarush.mentor.controller.user.UserRequest;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,29 +37,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Long userId) {
-        try {
-            return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Long userId) throws GeneralException {
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
     @PostMapping("/remove/{userId}")
-    public ResponseEntity<UserDTO> removeUserById(@PathVariable("userId") Long userId) {
-        try {
-            return new ResponseEntity<>(userService.removeUser(userId), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<UserDTO> removeUserById(@PathVariable("userId") Long userId) throws GeneralException {
+        return new ResponseEntity<>(userService.removeUser(userId), HttpStatus.OK);
     }
 
     @PostMapping("/permission")
-    public ResponseEntity<UserDTO> changePermission(@RequestBody UserPermissionRequest userPermissionRequest) {
-        try {
-            return new ResponseEntity<>(userService.changePermission(userPermissionRequest.getUserId(), userPermissionRequest.getRoleId()), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<UserDTO> changePermission(@RequestBody UserPermissionRequest userPermissionRequest) throws GeneralException {
+        return new ResponseEntity<>(userService.changePermission(userPermissionRequest.getUserId(), userPermissionRequest.getRoleId()), HttpStatus.OK);
     }
 }
