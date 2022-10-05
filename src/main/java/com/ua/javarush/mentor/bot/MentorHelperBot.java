@@ -18,27 +18,6 @@ public class MentorHelperBot extends TelegramLongPollingBot {
     @Value("${telegramBot.token}")
     private String botToken;
 
-    @Bean
-    public MentorHelperBot uploadBot(@Value("${telegramBot.username}") String botUsername,
-                                     @Value("${telegramBot.token}") String botToken) {
-        this.botUsername = botUsername;
-        this.botToken = botToken;
-        try {
-            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(this);
-            log.info("Bot {} was registered", botUsername);
-        } catch (TelegramApiException e) {
-            log.error("Error while registering bot", e);
-        }
-        return this;
-    }
-
-
-    @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
