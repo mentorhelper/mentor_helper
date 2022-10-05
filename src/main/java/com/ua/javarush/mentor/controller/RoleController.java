@@ -18,7 +18,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<RoleDTO> createNewRole(@RequestBody RoleCommand roleCommand) {
         return new ResponseEntity<>(roleService.create(roleCommand), HttpStatus.CREATED);
     }

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "`USER`")
 @Data
 @SequenceGenerator(name = "USER_SEQ_GENERATOR", sequenceName = "USER_SEQ", allocationSize = 1)
 public class User implements Serializable {
@@ -24,7 +24,7 @@ public class User implements Serializable {
     @Column(name = "REGISTERED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
-    @Column(name = "TELEGRAM_ID", unique = true, nullable = false)
+    @Column(name = "TELEGRAM_ID", unique = true)
     private Integer telegramId;
     @Column(name = "TELEGRAM_NICKNAME", length = 200, nullable = false)
     private String telegramNickname;

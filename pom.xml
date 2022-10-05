@@ -77,11 +77,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>4.16.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.5.2.Final</version>
@@ -94,7 +89,7 @@
         <!-- integrations -->
         <dependency>
             <groupId>org.telegram</groupId>
-            <artifactId>telegrambots</artifactId>
+            <artifactId>telegrambots-spring-boot-starter</artifactId>
             <version>6.1.0</version>
         </dependency>
         <dependency>

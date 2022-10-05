@@ -68,7 +68,6 @@ databaseChangeLog:
                   remarks: "User telegram identifier"
                   constraints:
                     unique: true
-                    nullable: false
               - column:
                   name: telegram_nickname
                   type: varchar(200)
