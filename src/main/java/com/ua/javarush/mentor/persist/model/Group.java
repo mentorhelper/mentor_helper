@@ -1,14 +1,19 @@
 package com.ua.javarush.mentor.persist.model;
 
-import lombok.Data;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "GROUP")
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @SequenceGenerator(name = "GROUP_SEQ_GENERATOR", sequenceName = "GROUP_SEQ", allocationSize = 1)
 public class Group implements Serializable {
     @Id
@@ -34,4 +39,17 @@ public class Group implements Serializable {
     private Integer studentsCountOnEnd;
     @Column(name = "HOURS_PER_LECTURE", nullable = false)
     private Integer hoursPerLecture;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Group group = (Group) o;
+        return id != null && Objects.equals(id, group.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
