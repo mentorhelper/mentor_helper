@@ -1,9 +1,9 @@
-package com.ua.javarush.mentor.controller.user;
+package com.ua.javarush.mentor.command;
 
 import lombok.Data;
 
 @Data
-public class UserRequest {
+public class UserCommand {
     private String firstName;
     private String lastName;
     private String country;

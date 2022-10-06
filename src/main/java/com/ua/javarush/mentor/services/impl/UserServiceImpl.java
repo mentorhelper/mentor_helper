@@ -1,14 +1,15 @@
 package com.ua.javarush.mentor.services.impl;
 
-import com.ua.javarush.mentor.controller.user.UserRequest;
+import com.ua.javarush.mentor.command.UserCommand;
+import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
-import com.ua.javarush.mentor.persist.repository.RoleRepository;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
+import com.ua.javarush.mentor.services.RoleService;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -31,23 +32,22 @@ public class UserServiceImpl implements UserService {
     public static final String LOG_USER_WAS_CREATED = "User '{} {}' was created";
     public static final String LOG_REMOVE_USER_ID_NAME = "Remove user: id={}, name={} {}";
     public static final String NOT_FOUND_USER_ERROR = "Didn't found user";
-    public static final String NOT_FOUND_ROLE_ERROR = "Didn't found role";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     @Value("${default.pageSize}")
     private Integer pageSize;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
     }
 
     @Transactional(rollbackFor = GeneralException.class)
     @Override
-    public UserDTO createUser(UserRequest userRequest) {
-        User newUser = userMapper.mapToEntity(userRequest);
+    public UserDTO createUser(UserCommand userCommand) throws GeneralException {
+        User newUser = userMapper.mapToEntity(userCommand);
         userRepository.save(newUser);
         log.info(LOG_USER_WAS_CREATED, newUser.getFirstName(), newUser.getLastName());
         return userMapper.mapToDto(newUser);
@@ -85,9 +85,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(rollbackFor = GeneralException.class)
     @Override
-    public UserDTO changePermission(Long id, Long roleId) throws GeneralException {
-        User user = fetchUser(id);
-        Role role = fetchRoleId(roleId);
+    public UserDTO changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException {
+        User user = fetchUser(userPermissionCommand.getUserId());
+        Role role = roleService.fetchRole(userPermissionCommand.getRoleId());
         user.setRoleId(role);
         userRepository.save(user);
         log.info(LOG_CHANGE_PERMISSION_USER_TO, user.getFirstName(), user.getLastName(), role.getName());
@@ -98,11 +98,5 @@ public class UserServiceImpl implements UserService {
     private User fetchUser(Long id) throws GeneralException {
         return userRepository.findById(id)
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
-    }
-
-    @NotNull
-    private Role fetchRoleId(Long roleId) throws GeneralException {
-        return roleRepository.findById(roleId)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_ROLE_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_NOT_FOUND));
     }
 }

@@ -1,9 +1,10 @@
 package com.ua.javarush.mentor.mapper;
 
-import com.ua.javarush.mentor.controller.user.UserRequest;
+import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.persist.model.User;
-import com.ua.javarush.mentor.persist.repository.RoleRepository;
+import com.ua.javarush.mentor.services.RoleService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, uses = {})
 public abstract class UserMapper {
     @Autowired
-    protected RoleRepository roleRepository;
+    protected RoleService roleService;
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "firstName", source = "firstName")
@@ -34,6 +35,6 @@ public abstract class UserMapper {
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
     @Mapping(target = "secretPhrase", source = "secretPhrase")
-    @Mapping(target = "roleId", expression = "java(roleRepository.findById(userRequest.getRoleId()).get())")
-    public abstract User mapToEntity(UserRequest userRequest);
+    @Mapping(target = "roleId", expression = "java(roleService.fetchRole(userCommand.getRoleId()))")
+    public abstract User mapToEntity(UserCommand userCommand) throws GeneralException;
 }

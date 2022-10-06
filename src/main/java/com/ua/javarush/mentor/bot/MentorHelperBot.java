@@ -2,21 +2,37 @@ package com.ua.javarush.mentor.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Slf4j
-@Component
+@Configuration
 public class MentorHelperBot extends TelegramLongPollingBot {
     private static final String GREETINGS = "Welcome to MentorHelper";
 
-    @Value("${telegramBot.username}")
     private String botUsername;
-    @Value("${telegramBot.token}")
     private String botToken;
+
+    @Bean
+    public MentorHelperBot uploadBot(@Value("${telegramBot.username}") String botUsername,
+                                     @Value("${telegramBot.token}") String botToken) {
+        this.botUsername = botUsername;
+        this.botToken = botToken;
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+            log.info("Bot {} was registered", botUsername);
+        } catch (TelegramApiException e) {
+            log.error("Error while registering bot", e);
+        }
+        return this;
+    }
 
     @Override
     public void onUpdateReceived(Update update) {

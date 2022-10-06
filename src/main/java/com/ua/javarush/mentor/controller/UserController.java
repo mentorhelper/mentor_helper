@@ -1,8 +1,7 @@
 package com.ua.javarush.mentor.controller;
 
-import com.ua.javarush.mentor.controller.user.UserPageableRequest;
-import com.ua.javarush.mentor.controller.user.UserPermissionRequest;
-import com.ua.javarush.mentor.controller.user.UserRequest;
+import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
@@ -22,18 +21,13 @@ public class UserController {
     }
 
     @PostMapping("")
-    public ResponseEntity<UserDTO> createNewRole(@RequestBody UserRequest userRequest) {
-        return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> createNewRole(@RequestBody UserCommand userCommand) throws GeneralException {
+        return new ResponseEntity<>(userService.createUser(userCommand), HttpStatus.CREATED);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(0), HttpStatus.OK);
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<UserDTO>> getAllUsersPageable(@RequestBody UserPageableRequest userPageableRequest) {
-        return new ResponseEntity<>(userService.getAllUsers(userPageableRequest.getPage()), HttpStatus.OK);
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "0") int page) {
+        return new ResponseEntity<>(userService.getAllUsers(page), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
@@ -47,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/permission")
-    public ResponseEntity<UserDTO> changePermission(@RequestBody UserPermissionRequest userPermissionRequest) throws GeneralException {
-        return new ResponseEntity<>(userService.changePermission(userPermissionRequest.getUserId(), userPermissionRequest.getRoleId()), HttpStatus.OK);
+    public ResponseEntity<UserDTO> changePermission(@RequestBody UserPermissionCommand userPermissionCommand) throws GeneralException {
+        return new ResponseEntity<>(userService.changePermission(userPermissionCommand), HttpStatus.OK);
     }
 }

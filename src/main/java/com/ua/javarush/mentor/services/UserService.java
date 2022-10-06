@@ -1,15 +1,16 @@
 package com.ua.javarush.mentor.services;
 
-import com.ua.javarush.mentor.controller.user.UserRequest;
+import com.ua.javarush.mentor.command.UserCommand;
+import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 
 import java.util.List;
 
 public interface UserService {
-    UserDTO createUser(UserRequest userRequest);
+    UserDTO createUser(UserCommand userCommand) throws GeneralException;
     List<UserDTO> getAllUsers(Integer page);
     UserDTO getUserById(Long id) throws GeneralException;
     UserDTO removeUser(Long id) throws GeneralException;
-    UserDTO changePermission(Long id, Long roleId) throws GeneralException;
+    UserDTO changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException;
 }
