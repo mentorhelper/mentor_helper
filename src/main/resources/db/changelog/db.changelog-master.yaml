@@ -553,3 +553,12 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
+  - changeSet:
+      id: 14
+      author: mckeydonelly
+      changes:
+        - dropNotNullConstraint:
+            columnDataType: integer
+            columnName: telegram_id
+            schemaName: public
+            tableName: user

@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "`USER`")
 @Getter
 @Setter
 @ToString
@@ -29,7 +29,7 @@ public class User implements Serializable {
     @Column(name = "REGISTERED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
-    @Column(name = "TELEGRAM_ID", unique = true, nullable = false)
+    @Column(name = "TELEGRAM_ID", unique = true)
     private Integer telegramId;
     @Column(name = "TELEGRAM_NICKNAME", length = 200, nullable = false)
     private String telegramNickname;

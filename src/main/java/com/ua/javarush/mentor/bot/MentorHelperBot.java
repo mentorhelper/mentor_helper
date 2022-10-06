@@ -35,11 +35,6 @@ public class MentorHelperBot extends TelegramLongPollingBot {
     }
 
     @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
-    @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             log.info("Message '{}' from user with id {}", update.getMessage().getText(), update.getMessage().getFrom().getId());
@@ -60,6 +55,11 @@ public class MentorHelperBot extends TelegramLongPollingBot {
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    @Override
+    public String getBotToken() {
+        return botToken;
     }
 
     @Override
