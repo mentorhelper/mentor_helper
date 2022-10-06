@@ -23,12 +23,12 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity<UserDTO> createNewRole(@RequestBody UserRequest userRequest) {
-        return new ResponseEntity<>(userService.create(userRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUsers(0), HttpStatus.OK);
     }
 
     @GetMapping("/list")

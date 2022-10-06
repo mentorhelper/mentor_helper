@@ -68,6 +68,7 @@ databaseChangeLog:
                   remarks: "User telegram identifier"
                   constraints:
                     unique: true
+                    nullable: false
               - column:
                   name: telegram_nickname
                   type: varchar(200)
@@ -552,3 +553,12 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
+  - changeSet:
+      id: 14
+      author: mckeydonelly
+      changes:
+        - dropNotNullConstraint:
+            columnDataType: integer
+            columnName: telegram_id
+            schemaName: public
+            tableName: user

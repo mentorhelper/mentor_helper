@@ -7,8 +7,7 @@ import com.ua.javarush.mentor.exceptions.GeneralException;
 import java.util.List;
 
 public interface UserService {
-    UserDTO create(UserRequest userRequest);
-    List<UserDTO> getAllUsers();
+    UserDTO createUser(UserRequest userRequest);
     List<UserDTO> getAllUsers(Integer page);
     UserDTO getUserById(Long id) throws GeneralException;
     UserDTO removeUser(Long id) throws GeneralException;

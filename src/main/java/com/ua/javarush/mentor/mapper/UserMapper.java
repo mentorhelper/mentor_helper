@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class UserMapper {
     @Autowired
     protected RoleRepository roleRepository;
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
@@ -28,6 +29,7 @@ public abstract class UserMapper {
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "country", source = "country")
+    @Mapping(target = "registeredAt", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
