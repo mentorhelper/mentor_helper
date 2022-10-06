@@ -272,7 +272,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: lection_count
+                  name: lecture_count
                   type: integer
                   remarks: "quantity of lectures"
                   constraints:

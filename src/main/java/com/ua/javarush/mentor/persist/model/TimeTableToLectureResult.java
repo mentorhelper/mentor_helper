@@ -11,24 +11,24 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "GROUP_TO_WEEKEND")
+@Table(name = "TIMETABLE_TO_LECTURE_RESULT")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class GroupToWeekend implements Serializable {
+public class TimeTableToLectureResult implements Serializable {
     @Id
-    @Column(name = "GROUP_ID", nullable = false)
-    private Long groupId;
-    @Column(name = "NUMBER_OF_DAY", nullable = false)
-    private Integer numberOfDay;
+    @Column(name = "TIMETABLE_ID", unique = true, nullable = false)
+    private Long timetableId;
+    @Column(name = "LECTURE_RESULT_ID", nullable = false)
+    private Integer lectureResultId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        GroupToWeekend that = (GroupToWeekend) o;
-        return groupId != null && Objects.equals(groupId, that.groupId);
+        TimeTableToLectureResult that = (TimeTableToLectureResult) o;
+        return timetableId != null && Objects.equals(timetableId, that.timetableId);
     }
 
     @Override

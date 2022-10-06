@@ -1,14 +1,19 @@
 package com.ua.javarush.mentor.persist.model;
 
-import lombok.Data;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "BOT_ENTER_HISTORY")
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @SequenceGenerator(name = "BOT_ENTER_HISTORY_SEQ_GENERATOR", sequenceName = "BOT_ENTER_SEQ", allocationSize = 1)
 public class BotEnterHistory implements Serializable {
     @Id
@@ -27,4 +32,17 @@ public class BotEnterHistory implements Serializable {
     private String lastName;
     @Column(name = "COMMAND", length = 100, nullable = false)
     private String command;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        BotEnterHistory that = (BotEnterHistory) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
