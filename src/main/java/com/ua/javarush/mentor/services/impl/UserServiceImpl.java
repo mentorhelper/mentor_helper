@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService {
         this.roleService = roleService;
     }
 
-    @Transactional(rollbackFor = GeneralException.class)
     @Override
+    @Transactional(rollbackFor = GeneralException.class)
     public UserDTO createUser(UserCommand userCommand) throws GeneralException {
         User newUser = userMapper.mapToEntity(userCommand);
         userRepository.save(newUser);
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUsers(Integer page) {
-        if(page == 0) {
+        if (page == 0) {
             return userRepository.findAll()
                     .stream()
                     .map(userMapper::mapToDto)
@@ -74,24 +74,22 @@ public class UserServiceImpl implements UserService {
         return userMapper.mapToDto(user);
     }
 
-    @Transactional(rollbackFor = GeneralException.class)
     @Override
-    public UserDTO removeUser(Long id) throws GeneralException {
+    @Transactional(rollbackFor = GeneralException.class)
+    public void removeUser(Long id) throws GeneralException {
         User user = fetchUser(id);
-        log.info(LOG_REMOVE_USER_ID_NAME, id, user.getFirstName(), user.getLastName());
         userRepository.deleteById(id);
-        return userMapper.mapToDto(user);
+        log.info(LOG_REMOVE_USER_ID_NAME, id, user.getFirstName(), user.getLastName());
     }
 
-    @Transactional(rollbackFor = GeneralException.class)
     @Override
-    public UserDTO changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException {
+    @Transactional(rollbackFor = GeneralException.class)
+    public void changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException {
         User user = fetchUser(userPermissionCommand.getUserId());
         Role role = roleService.fetchRole(userPermissionCommand.getRoleId());
         user.setRoleId(role);
         userRepository.save(user);
         log.info(LOG_CHANGE_PERMISSION_USER_TO, user.getFirstName(), user.getLastName(), role.getName());
-        return userMapper.mapToDto(user);
     }
 
     @NotNull

@@ -11,6 +11,6 @@ public interface UserService {
     UserDTO createUser(UserCommand userCommand) throws GeneralException;
     List<UserDTO> getAllUsers(Integer page);
     UserDTO getUserById(Long id) throws GeneralException;
-    UserDTO removeUser(Long id) throws GeneralException;
-    UserDTO changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException;
+    void removeUser(Long id) throws GeneralException;
+    void changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException;
 }

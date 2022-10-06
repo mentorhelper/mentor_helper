@@ -35,13 +35,15 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
-    @PostMapping("/remove/{userId}")
-    public ResponseEntity<UserDTO> removeUserById(@PathVariable("userId") Long userId) throws GeneralException {
-        return new ResponseEntity<>(userService.removeUser(userId), HttpStatus.OK);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> removeUserById(@PathVariable("userId") Long userId) throws GeneralException {
+        userService.removeUser(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/permission")
-    public ResponseEntity<UserDTO> changePermission(@RequestBody UserPermissionCommand userPermissionCommand) throws GeneralException {
-        return new ResponseEntity<>(userService.changePermission(userPermissionCommand), HttpStatus.OK);
+    public ResponseEntity<Void> changePermission(@RequestBody UserPermissionCommand userPermissionCommand) throws GeneralException {
+        userService.changePermission(userPermissionCommand);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
