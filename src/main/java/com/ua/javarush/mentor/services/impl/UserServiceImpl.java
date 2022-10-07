@@ -13,13 +13,16 @@ import com.ua.javarush.mentor.services.RoleService;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
@@ -35,8 +38,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleService roleService;
-    @Value("${default.pageSize}")
-    private Integer pageSize;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService) {
         this.userRepository = userRepository;
@@ -54,17 +55,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers(Integer page) {
-        if (page == 0) {
-            return userRepository.findAll()
-                    .stream()
-                    .map(userMapper::mapToDto)
-                    .collect(Collectors.toList());
+    public Map<String, Object> getAllUsers(int page, int size, String sortBy) {
+        Pageable paging = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<User> users = userRepository.findAll(paging);
+
+        if(users.isEmpty()) {
+            return new HashMap<>();
         }
-        return userRepository.findAll(Pageable.ofSize(pageSize).withPage(page))
-                .stream()
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", users.stream()
                 .map(userMapper::mapToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+        response.put("currentPage", users.getNumber());
+        response.put("totalItems", users.getTotalElements());
+        response.put("totalPages", users.getTotalPages());
+        return response;
     }
 
     @Override

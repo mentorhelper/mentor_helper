@@ -1,7 +1,7 @@
 package com.ua.javarush.mentor.controller;
 
-import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.command.UserCommand;
+import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -26,8 +26,12 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "0") int page) {
-        return new ResponseEntity<>(userService.getAllUsers(page), HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "${default.pageSize}") int size,
+            @RequestParam(value = "sortBy", required = false, defaultValue = "${user.sortBy}") String sortBy
+    ) {
+        return new ResponseEntity<>(userService.getAllUsers(page, size, sortBy), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
