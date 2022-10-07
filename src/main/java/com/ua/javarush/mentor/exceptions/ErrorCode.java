@@ -13,4 +13,5 @@ public class ErrorCode {
     public static final String USER_NOT_FOUND = "2";
     public static final String ROLE_NOT_FOUND = "3";
     public static final String TELEGRAM_SEND_MESSAGE_ERROR = "4";
+    public static final String TELEGRAM_ID_NOT_FOUND = "5";
 }

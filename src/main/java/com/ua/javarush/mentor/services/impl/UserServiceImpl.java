@@ -93,7 +93,11 @@ public class UserServiceImpl implements UserService {
     public void sendMessage(UserMessageCommand userMessageCommand) throws GeneralException {
         User user = fetchUser(userMessageCommand.getUserId());
         log.info("Send message '{}' to user: {} {}", userMessageCommand.getMessage(), user.getFirstName(), user.getLastName());
-        telegramService.sendMessage(user.getTelegramId(), userMessageCommand.getMessage());
+        if (user.getTelegramId() != null) {
+            telegramService.sendMessage(user.getTelegramId(), userMessageCommand.getMessage());
+        } else {
+            throw createGeneralException("Telegram id not set for user with id " + user.getId(), HttpStatus.BAD_REQUEST, Error.TELEGRAM_ID_NOT_FOUND);
+        }
     }
 
     @NotNull
