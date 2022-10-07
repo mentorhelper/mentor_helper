@@ -30,7 +30,7 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
     @Column(name = "TELEGRAM_ID", unique = true)
-    private Integer telegramId;
+    private Long telegramId;
     @Column(name = "TELEGRAM_NICKNAME", length = 200, nullable = false)
     private String telegramNickname;
     @Column(name = "SALARY_PER_HOUR")
