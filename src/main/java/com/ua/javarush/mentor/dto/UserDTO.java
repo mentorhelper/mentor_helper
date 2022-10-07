@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 
 @Data
 @Builder
@@ -23,7 +22,7 @@ public class UserDTO {
     @Schema(description = "Country")
     private String country;
     @Schema(description = "Registered at")
-    private Date registeredAt;
+    private String registeredAt;
     @Schema(description = "Telegram id")
     private Integer telegramId;
     @Schema(description = "Telegram nickname")

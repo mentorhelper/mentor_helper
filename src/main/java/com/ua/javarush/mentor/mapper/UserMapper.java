@@ -9,8 +9,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, uses = {})
-public abstract class UserMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+public abstract class UserMapper implements Converter {
+
     @Autowired
     protected RoleService roleService;
 
@@ -18,7 +19,7 @@ public abstract class UserMapper {
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "country", source = "country")
-    @Mapping(target = "registeredAt", source = "registeredAt")
+    @Mapping(target = "registeredAt", source = "registeredAt", qualifiedByName = "dateToString")
     @Mapping(target = "telegramId", source = "telegramId")
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
