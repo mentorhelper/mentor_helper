@@ -1,10 +1,14 @@
 package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.command.RoleCommand;
+import com.ua.javarush.mentor.command.RoleToPermissionCommand;
+import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.RoleDTO;
+import com.ua.javarush.mentor.dto.RoleToPermissionDTO;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.RoleMapper;
+import com.ua.javarush.mentor.mapper.RoleToPermissionMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.RoleToPermission;
 import com.ua.javarush.mentor.persist.repository.RoleRepository;
@@ -20,10 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
@@ -33,15 +33,24 @@ public class RoleServiceImpl implements RoleService {
     public static final String NOT_FOUND_PERMISSION_ERROR = "Didn't found permission";
     public static final String LOG_RESPONSE_ROLE = "Response role: {}";
     public static final String LOG_ROLE_WAS_CREATED = "Create new role with name {}";
+    public static final String RESPONSE_ROLE_PERMISSION_FOR_ROLE_ID = "Response role permission for roleId {}";
+    public static final String ADD_PERMISSION_TO_ROLE_ID = "Add permission {} to roleId {}";
+    public static final String REMOVE_ROLE_ID_NAME = "Remove role: id={}, name={}";
+    public static final String REMOVE_PERMISSION_FROM_ROLE_ID = "Remove permission {} from roleId {}";
 
     private final RoleRepository roleRepository;
     private final RoleToPermissionRepository roleToPermissionRepository;
     private final RoleMapper roleMapper;
+    private final RoleToPermissionMapper roleToPermissionMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository, RoleToPermissionRepository roleToPermissionRepository, RoleMapper roleMapper) {
+    public RoleServiceImpl(RoleRepository roleRepository,
+                           RoleToPermissionRepository roleToPermissionRepository,
+                           RoleMapper roleMapper,
+                           RoleToPermissionMapper roleToPermissionMapper) {
         this.roleRepository = roleRepository;
         this.roleToPermissionRepository = roleToPermissionRepository;
         this.roleMapper = roleMapper;
+        this.roleToPermissionMapper = roleToPermissionMapper;
     }
 
 
@@ -62,42 +71,44 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Map<String, Object> getAllRoles(int page, int size, String sortBy) {
+    public PageDTO<RoleDTO> getAllRoles(int page, int size, String sortBy) {
         Pageable paging = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<Role> users = roleRepository.findAll(paging);
-
-        if(users.isEmpty()) {
-            return new HashMap<>();
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("users", users.stream()
-                .map(roleMapper::mapToDto)
-                .collect(Collectors.toList());
-        response.put("currentPage", users.getNumber());
-        response.put("totalItems", users.getTotalElements());
-        response.put("totalPages", users.getTotalPages());
-        return response;
+        Page<RoleDTO> users = roleRepository.findAll(paging)
+                .map(roleMapper::mapToDto);
+        return new PageDTO<>(users, paging);
     }
 
     @Override
-    public RoleDTO getRolePermissionById(Long roleId) throws GeneralException {
-        return null;
+    @Transactional(rollbackFor = GeneralException.class)
+    public RoleToPermissionDTO getRolePermissionById(Long roleId) throws GeneralException {
+        RoleToPermission roleToPermission = fetchRoleToPermission(roleId);
+        log.info(RESPONSE_ROLE_PERMISSION_FOR_ROLE_ID, roleToPermission.getRoleId());
+        return roleToPermissionMapper.mapToDto(roleToPermission);
     }
 
     @Override
-    public RoleDTO addPermissionToRole(Long roleId) throws GeneralException {
-        return null;
+    @Transactional(rollbackFor = GeneralException.class)
+    public RoleToPermissionDTO addPermissionToRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) {
+        RoleToPermission roleToPermission = roleToPermissionMapper.mapToEntity(roleId, roleToPermissionCommand);
+        roleToPermissionRepository.save(roleToPermission);
+        log.info(ADD_PERMISSION_TO_ROLE_ID, roleToPermission.getPermission(), roleToPermission.getRoleId());
+        return roleToPermissionMapper.mapToDto(roleToPermission);
     }
 
     @Override
-    public RoleDTO removeRole(Long roleId) throws GeneralException {
-        return null;
+    @Transactional
+    public void removeRole(Long roleId) throws GeneralException {
+        Role role = fetchRole(roleId);
+        roleRepository.deleteById(roleId);
+        log.info(REMOVE_ROLE_ID_NAME, role.getId(), role.getName());
     }
 
     @Override
-    public RoleDTO removePermissionInRole(Long roleId) throws GeneralException {
-        return null;
+    @Transactional
+    public void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) {
+        RoleToPermission roleToPermission = roleToPermissionMapper.mapToEntity(roleId, roleToPermissionCommand);
+        log.info(REMOVE_PERMISSION_FROM_ROLE_ID, roleToPermissionCommand.getPermission(), roleId);
+        roleToPermissionRepository.delete(roleToPermission);
     }
 
     @NotNull
@@ -109,8 +120,8 @@ public class RoleServiceImpl implements RoleService {
 
     @NotNull
     @Override
-    public RoleToPermission RoleToPermission(Long roleId) throws GeneralException {
+    public RoleToPermission fetchRoleToPermission(Long roleId) throws GeneralException {
         return roleToPermissionRepository.findById(roleId)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_PERMISSION_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_PERMISSION_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_PERMISSION_NOT_FOUND));
     }
 }

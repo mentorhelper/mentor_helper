@@ -1,8 +1,11 @@
 package com.ua.javarush.mentor.controller;
 
 import com.ua.javarush.mentor.command.RoleCommand;
+import com.ua.javarush.mentor.command.RoleToPermissionCommand;
 import com.ua.javarush.mentor.dto.ErrorDTO;
+import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.RoleDTO;
+import com.ua.javarush.mentor.dto.RoleToPermissionDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,8 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/role")
@@ -63,7 +64,7 @@ public class RoleController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<Map<String, Object>> getAllRole(
+    public ResponseEntity<PageDTO<RoleDTO>> getAllRole(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "${default.pageSize}") int size,
             @RequestParam(value = "sortBy", required = false, defaultValue = "${role.sortBy}") String sortBy
@@ -100,14 +101,14 @@ public class RoleController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = @Content(
-                                    array = @ArraySchema(schema = @Schema(implementation = RoleDTO.class))
+                                    array = @ArraySchema(schema = @Schema(implementation = RoleToPermissionDTO.class))
                             )),
                     @ApiResponse(responseCode = "400", description = "Bad request",
                             content = @Content(
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<RoleDTO> getRolePermission(@PathVariable Long roleId) throws GeneralException {
+    public ResponseEntity<RoleToPermissionDTO> getRolePermission(@PathVariable Long roleId) throws GeneralException {
         return new ResponseEntity<>(roleService.getRolePermissionById(roleId), HttpStatus.OK);
     }
 
@@ -120,15 +121,15 @@ public class RoleController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = @Content(
-                                    schema = @Schema(implementation = RoleDTO.class)
+                                    schema = @Schema(implementation = RoleToPermissionDTO.class)
                             )),
                     @ApiResponse(responseCode = "400", description = "Bad request",
                             content = @Content(
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<RoleDTO> addPermissionToRole(@PathVariable Long roleId) throws GeneralException {
-        return new ResponseEntity<>(roleService.addPermissionToRole(roleId), HttpStatus.OK);
+    public ResponseEntity<RoleToPermissionDTO> addPermissionToRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) {
+        return new ResponseEntity<>(roleService.addPermissionToRole(roleId, roleToPermissionCommand), HttpStatus.OK);
     }
 
     @DeleteMapping("/{roleId}")
@@ -147,8 +148,9 @@ public class RoleController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<RoleDTO> removeRole(@PathVariable Long roleId) throws GeneralException {
-        return new ResponseEntity<>(roleService.removeRole(roleId), HttpStatus.OK);
+    public ResponseEntity<Void> removeRole(@PathVariable Long roleId) throws GeneralException {
+        roleService.removeRole(roleId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{roleId}/permission")
@@ -167,7 +169,8 @@ public class RoleController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<RoleDTO> removePermissionInRole(@PathVariable Long roleId) throws GeneralException {
-        return new ResponseEntity<>(roleService.removePermissionInRole(roleId), HttpStatus.OK);
+    public ResponseEntity<Void> removePermissionInRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) {
+        roleService.removePermissionInRole(roleId, roleToPermissionCommand);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
