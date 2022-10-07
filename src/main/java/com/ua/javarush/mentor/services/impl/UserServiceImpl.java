@@ -1,7 +1,9 @@
 package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.command.UserCommand;
+import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
@@ -22,9 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
@@ -40,8 +39,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleService roleService;
     private final TelegramService telegramService;
-    @Value("${default.pageSize}")
-    private Integer pageSize;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService, TelegramService telegramService) {
         this.userRepository = userRepository;
@@ -60,22 +57,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> getAllUsers(int page, int size, String sortBy) {
+    public PageDTO<UserDTO> getAllUsers(int page, int size, String sortBy) {
         Pageable paging = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<User> users = userRepository.findAll(paging);
-
-        if(users.isEmpty()) {
-            return new HashMap<>();
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("users", users.stream()
-                .map(userMapper::mapToDto)
-                .collect(Collectors.toList()));
-        response.put("currentPage", users.getNumber());
-        response.put("totalItems", users.getTotalElements());
-        response.put("totalPages", users.getTotalPages());
-        return response;
+        Page<UserDTO> users = userRepository.findAll(paging)
+                .map(userMapper::mapToDto);
+        return new PageDTO<>(users, paging);
     }
 
     @Override
