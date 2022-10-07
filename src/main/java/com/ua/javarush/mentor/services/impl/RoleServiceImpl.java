@@ -7,12 +7,15 @@ import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.RoleMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.repository.RoleRepository;
+import com.ua.javarush.mentor.persist.repository.RoleToPermissionRepository;
 import com.ua.javarush.mentor.services.RoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
@@ -23,16 +26,18 @@ public class RoleServiceImpl implements RoleService {
     public static final String LOG_RESPONSE_ROLE = "Response role: {}";
 
     private final RoleRepository roleRepository;
+    private final RoleToPermissionRepository roleToPermissionRepository;
     private final RoleMapper roleMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository, RoleMapper roleMapper) {
+    public RoleServiceImpl(RoleRepository roleRepository, RoleToPermissionRepository roleToPermissionRepository, RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
+        this.roleToPermissionRepository = roleToPermissionRepository;
         this.roleMapper = roleMapper;
     }
 
 
-    @Transactional
     @Override
+    @Transactional(rollbackFor = GeneralException.class)
     public RoleDTO createRole(RoleCommand roleCommand) {
         Role newRole = roleMapper.mapToEntity(roleCommand);
         roleRepository.save(newRole);
@@ -45,6 +50,31 @@ public class RoleServiceImpl implements RoleService {
         Role role = fetchRole(id);
         log.info(LOG_RESPONSE_ROLE, role.getName());
         return roleMapper.mapToDto(role);
+    }
+
+    @Override
+    public Map<String, Object> getAllRoles(int page, int size, String sortBy) {
+        return null;
+    }
+
+    @Override
+    public RoleDTO getRolePermissionById(Long roleId) throws GeneralException {
+        return null;
+    }
+
+    @Override
+    public RoleDTO addPermissionToRole(Long roleId) throws GeneralException {
+        return null;
+    }
+
+    @Override
+    public RoleDTO removeRole(Long roleId) throws GeneralException {
+        return null;
+    }
+
+    @Override
+    public RoleDTO removePermissionInRole(Long roleId) throws GeneralException {
+        return null;
     }
 
     @NotNull
