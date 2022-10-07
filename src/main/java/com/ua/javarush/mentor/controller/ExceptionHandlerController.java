@@ -4,6 +4,7 @@ import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.ErrorMapper;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Slf4j
 @ControllerAdvice
+@Hidden
 public class ExceptionHandlerController {
 
     private final ErrorMapper errorMapper;
