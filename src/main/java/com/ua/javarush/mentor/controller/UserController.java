@@ -1,9 +1,10 @@
 package com.ua.javarush.mentor.controller;
 
+import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
-import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.dto.ErrorDTO;
+import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -56,7 +56,8 @@ public class UserController {
             description = "Get all users",
             parameters = {
                     @Parameter(name = "page", description = "Page number", required = true),
-                    @Parameter(name = "size", description = "Page size", required = true)
+                    @Parameter(name = "size", description = "Page size", required = true),
+                    @Parameter(name = "sort", description = "Sort by field", required = true)
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
@@ -68,9 +69,11 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "User")
-    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        return new ResponseEntity<>(userService.getAllUsers(page, size), HttpStatus.OK);
+    public ResponseEntity<PageDTO<UserDTO>> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "${default.pageSize}") int size,
+            @RequestParam(value = "sort", required = false, defaultValue = "${user.sortBy}") String sortBy) {
+        return new ResponseEntity<>(userService.getAllUsers(page, size, sortBy), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
