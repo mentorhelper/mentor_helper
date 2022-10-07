@@ -4,7 +4,6 @@ import com.ua.javarush.mentor.command.RoleCommand;
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.dto.RoleDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
-import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.services.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
