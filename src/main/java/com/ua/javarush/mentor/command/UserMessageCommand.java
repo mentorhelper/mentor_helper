@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "User permission command")
-public class UserPermissionCommand {
+@Schema(description = "User message command")
+public class UserMessageCommand {
     @Schema(description = "User id")
     private Long userId;
-    @Schema(description = "Role id")
-    private Long roleId;
+    @Schema(description = "Message id")
+    private String message;
 }

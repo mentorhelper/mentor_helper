@@ -1,6 +1,7 @@
 package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.command.UserCommand;
+import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.Error;
@@ -10,6 +11,7 @@ import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
 import com.ua.javarush.mentor.services.RoleService;
+import com.ua.javarush.mentor.services.TelegramService;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -35,13 +37,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleService roleService;
+    private final TelegramService telegramService;
     @Value("${default.pageSize}")
     private Integer pageSize;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService, TelegramService telegramService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.roleService = roleService;
+        this.telegramService = telegramService;
     }
 
     @Override
@@ -54,14 +58,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers(Integer page) {
+    public List<UserDTO> getAllUsers(Integer page, Integer size) {
         if (page == 0) {
             return userRepository.findAll()
                     .stream()
                     .map(userMapper::mapToDto)
                     .collect(Collectors.toList());
         }
-        return userRepository.findAll(Pageable.ofSize(pageSize).withPage(page))
+        return userRepository.findAll(Pageable.ofSize(size != null ? size : pageSize).withPage(page))
                 .stream()
                 .map(userMapper::mapToDto)
                 .collect(Collectors.toList());
@@ -90,6 +94,13 @@ public class UserServiceImpl implements UserService {
         user.setRoleId(role);
         userRepository.save(user);
         log.info(LOG_CHANGE_PERMISSION_USER_TO, user.getFirstName(), user.getLastName(), role.getName());
+    }
+
+    @Override
+    public void sendMessage(UserMessageCommand userMessageCommand) throws GeneralException {
+        User user = fetchUser(userMessageCommand.getUserId());
+        log.info("Send message '{}' to user: {} {}", userMessageCommand.getMessage(), user.getFirstName(), user.getLastName());
+        telegramService.sendMessage(user.getTelegramId(), userMessageCommand.getMessage());
     }
 
     @NotNull
