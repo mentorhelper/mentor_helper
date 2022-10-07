@@ -3,6 +3,7 @@ package com.ua.javarush.mentor.services.impl;
 import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
@@ -15,14 +16,14 @@ import com.ua.javarush.mentor.services.TelegramService;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
@@ -38,8 +39,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleService roleService;
     private final TelegramService telegramService;
-    @Value("${default.pageSize}")
-    private Integer pageSize;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService, TelegramService telegramService) {
         this.userRepository = userRepository;
@@ -58,17 +57,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers(Integer page, Integer size) {
-        if (page == 0) {
-            return userRepository.findAll()
-                    .stream()
-                    .map(userMapper::mapToDto)
-                    .collect(Collectors.toList());
-        }
-        return userRepository.findAll(Pageable.ofSize(size != null ? size : pageSize).withPage(page))
-                .stream()
-                .map(userMapper::mapToDto)
-                .collect(Collectors.toList());
+    public PageDTO<UserDTO> getAllUsers(int page, int size, String sortBy) {
+        Pageable paging = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<UserDTO> users = userRepository.findAll(paging)
+                .map(userMapper::mapToDto);
+        return new PageDTO<>(users, paging);
     }
 
     @Override
