@@ -37,6 +37,7 @@ public class RoleServiceImpl implements RoleService {
     public static final String ADD_PERMISSION_TO_ROLE_ID = "Add permission {} to roleId {}";
     public static final String REMOVE_ROLE_ID_NAME = "Remove role: id={}, name={}";
     public static final String REMOVE_PERMISSION_FROM_ROLE_ID = "Remove permission {} from roleId {}";
+    public static final String ROLE_WITH_ID_ALREADY_HAVE_PERMISSION = "Role with id {} already have permission: {}";
 
     private final RoleRepository roleRepository;
     private final RoleToPermissionRepository roleToPermissionRepository;
@@ -79,34 +80,39 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = GeneralException.class)
     public RoleToPermissionDTO getRolePermissionById(Long roleId) throws GeneralException {
-        RoleToPermission roleToPermission = fetchRoleToPermission(roleId);
-        log.info(RESPONSE_ROLE_PERMISSION_FOR_ROLE_ID, roleToPermission.getRoleId());
-        return roleToPermissionMapper.mapToDto(roleToPermission);
+        Role role = fetchRole(roleId);
+        log.info(RESPONSE_ROLE_PERMISSION_FOR_ROLE_ID, role.getId());
+        return roleToPermissionMapper.mapToDto(role);
     }
 
     @Override
     @Transactional(rollbackFor = GeneralException.class)
-    public RoleToPermissionDTO addPermissionToRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) {
-        RoleToPermission roleToPermission = roleToPermissionMapper.mapToEntity(roleId, roleToPermissionCommand);
-        roleToPermissionRepository.save(roleToPermission);
-        log.info(ADD_PERMISSION_TO_ROLE_ID, roleToPermission.getPermission(), roleToPermission.getRoleId());
-        return roleToPermissionMapper.mapToDto(roleToPermission);
+    public RoleToPermissionDTO addPermissionToRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
+        if (!isExistPermissionByRole(roleId, roleToPermissionCommand)) {
+            RoleToPermission newPermission = roleToPermissionMapper.mapToEntity(roleId, roleToPermissionCommand);
+            roleToPermissionRepository.save(newPermission);
+            log.info(ADD_PERMISSION_TO_ROLE_ID, newPermission.getPermission(), newPermission.getRoleId());
+        } else {
+            log.info(ROLE_WITH_ID_ALREADY_HAVE_PERMISSION, roleId, roleToPermissionCommand.getPermission());
+        }
+        return roleToPermissionMapper.mapToDto(fetchRole(roleId));
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = GeneralException.class)
     public void removeRole(Long roleId) throws GeneralException {
         Role role = fetchRole(roleId);
         roleRepository.deleteById(roleId);
+        role.getPermissions()
+                .forEach(roleToPermission -> roleToPermissionRepository.deleteById(roleToPermission.getId()));
         log.info(REMOVE_ROLE_ID_NAME, role.getId(), role.getName());
     }
 
     @Override
-    @Transactional
-    public void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) {
-        RoleToPermission roleToPermission = roleToPermissionMapper.mapToEntity(roleId, roleToPermissionCommand);
+    @Transactional(rollbackFor = GeneralException.class)
+    public void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
+        RoleToPermission roleToPermission = fetchPermissionByRoleId(roleId, roleToPermissionCommand);
         log.info(REMOVE_PERMISSION_FROM_ROLE_ID, roleToPermissionCommand.getPermission(), roleId);
         roleToPermissionRepository.delete(roleToPermission);
     }
@@ -119,9 +125,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @NotNull
-    @Override
-    public RoleToPermission fetchRoleToPermission(Long roleId) throws GeneralException {
-        return roleToPermissionRepository.findById(roleId)
+    private RoleToPermission fetchPermissionByRoleId(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
+        return fetchRole(roleId).getPermissions().stream()
+                .filter(permission -> permission.getPermission().equals(roleToPermissionCommand.getPermission()))
+                .findAny()
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_PERMISSION_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_PERMISSION_NOT_FOUND));
+    }
+
+    private boolean isExistPermissionByRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
+        return fetchRole(roleId).getPermissions().stream()
+                .filter(permission -> permission.getPermission().equals(roleToPermissionCommand.getPermission()))
+                .count() > 0;
     }
 }

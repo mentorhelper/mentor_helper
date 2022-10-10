@@ -19,13 +19,11 @@ public interface RoleService {
 
     RoleToPermissionDTO getRolePermissionById(Long roleId) throws GeneralException;
 
-    RoleToPermissionDTO addPermissionToRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand);
+    RoleToPermissionDTO addPermissionToRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException;
 
     void removeRole(Long roleId) throws GeneralException;
 
-    void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand);
+    void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException;
 
     Role fetchRole(Long roleId) throws GeneralException;
-
-    RoleToPermission fetchRoleToPermission(Long roleId) throws GeneralException;
 }

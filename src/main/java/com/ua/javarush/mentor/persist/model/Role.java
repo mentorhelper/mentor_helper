@@ -1,10 +1,14 @@
 package com.ua.javarush.mentor.persist.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +25,9 @@ public class Role implements Serializable {
     private Long id;
     @Column(name = "NAME", length = 200, unique = true, nullable = false)
     private String name;
+    @OneToMany(mappedBy = "roleId", fetch = FetchType.EAGER)
+    @Column(name = "ROLE_PERMISSION")
+    private List<RoleToPermission> permissions;
 
     @Override
     public boolean equals(Object o) {

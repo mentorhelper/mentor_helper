@@ -128,7 +128,7 @@ public class RoleController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<RoleToPermissionDTO> addPermissionToRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) {
+    public ResponseEntity<RoleToPermissionDTO> addPermissionToRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
         return new ResponseEntity<>(roleService.addPermissionToRole(roleId, roleToPermissionCommand), HttpStatus.OK);
     }
 
@@ -169,7 +169,7 @@ public class RoleController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "Role")
-    public ResponseEntity<Void> removePermissionInRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) {
+    public ResponseEntity<Void> removePermissionInRole(@PathVariable Long roleId, @RequestBody RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
         roleService.removePermissionInRole(roleId, roleToPermissionCommand);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
