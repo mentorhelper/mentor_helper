@@ -134,7 +134,6 @@ public class RoleServiceImpl implements RoleService {
 
     private boolean isExistPermissionByRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {
         return fetchRole(roleId).getPermissions().stream()
-                .filter(permission -> permission.getPermission().equals(roleToPermissionCommand.getPermission()))
-                .count() > 0;
+                .anyMatch(permission -> permission.getPermission().equals(roleToPermissionCommand.getPermission()));
     }
 }
