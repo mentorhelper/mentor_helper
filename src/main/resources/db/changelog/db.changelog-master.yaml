@@ -566,8 +566,7 @@ databaseChangeLog:
       id: 15
       author: mckeydonelly
       changes:
-        - dropColumn:
-            columnName: role_id
+        - dropPrimaryKey:
             tableName: role_to_permission
         - addColumn:
             tableName: role_to_permission
@@ -580,12 +579,6 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
                     unique: true
-              - column:
-                  name: role_id
-                  type: bigint
-                  remarks: "Role id"
-                  constraints:
-                    nullable: false
         - createSequence:
             sequenceName: role_permission_seq
             incrementBy: 1

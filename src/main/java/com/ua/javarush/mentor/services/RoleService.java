@@ -7,7 +7,6 @@ import com.ua.javarush.mentor.dto.RoleDTO;
 import com.ua.javarush.mentor.dto.RoleToPermissionDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.persist.model.Role;
-import com.ua.javarush.mentor.persist.model.RoleToPermission;
 
 public interface RoleService {
 
