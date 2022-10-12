@@ -562,3 +562,26 @@ databaseChangeLog:
             columnName: telegram_id
             schemaName: public
             tableName: user
+  - changeSet:
+      id: 15
+      author: mckeydonelly
+      changes:
+        - dropPrimaryKey:
+            tableName: role_to_permission
+        - addColumn:
+            tableName: role_to_permission
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Permission id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+        - createSequence:
+            sequenceName: role_permission_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
