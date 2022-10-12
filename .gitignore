@@ -24,5 +24,4 @@ hs_err_pid*
 
 /.idea/
 /target/
-/env.properties
 /env
