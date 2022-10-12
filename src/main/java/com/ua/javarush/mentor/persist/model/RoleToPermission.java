@@ -3,10 +3,7 @@ package com.ua.javarush.mentor.persist.model;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -16,12 +13,17 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@SequenceGenerator(name = "ROLE_PERMISSION_SEQ_GENERATOR", sequenceName = "ROLE_PERMISSION_SEQ", allocationSize = 1)
 public class RoleToPermission implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "ROLE_PERMISSION_SEQ")
+    @Column(name = "ID", nullable = false)
+    private Long id;
     @Column(name = "ROLE_ID", nullable = false)
     private Long roleId;
     @Column(name = "PERMISSION", length = 200, nullable = false)
-    private String permission;
+    @Enumerated(EnumType.STRING)
+    private PermissionType permission;
 
     @Override
     public boolean equals(Object o) {
