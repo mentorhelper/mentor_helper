@@ -1,7 +1,9 @@
 package com.ua.javarush.mentor.bot;
 
+import com.ua.javarush.mentor.enums.AppLocale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -14,10 +16,13 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Slf4j
 @Configuration
 public class MentorHelperBot extends TelegramLongPollingBot {
-    private static final String GREETINGS = "Welcome to MentorHelper";
-
     private String botUsername;
     private String botToken;
+    private final MessageSource messageSource;
+
+    public MentorHelperBot(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @Bean
     public MentorHelperBot uploadBot(@Value("${telegramBot.username}") String botUsername,
@@ -44,10 +49,12 @@ public class MentorHelperBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText() != null ? update.getMessage().getText() : "";
             switch (messageText) {
                 case "/start":
-                    message.setText(GREETINGS);
+                    String greetings = messageSource.getMessage("telegram.greeting", null, AppLocale.UA.getLocaleObject());
+                    message.setText(greetings);
                     break;
                 default:
-                    message.setText("I don't understand you");
+                    String unknownCommand = messageSource.getMessage("telegram.unknownCommand", null,  AppLocale.UA.getLocaleObject());
+                    message.setText(unknownCommand);
             }
             try {
                 execute(message);
