@@ -1,0 +1,18 @@
+package com.ua.javarush.mentor.exceptions;
+
+import lombok.ToString;
+
+@ToString
+public class ErrorCode {
+
+    private ErrorCode() {
+    }
+
+    public static final String APPLICATION_ERROR = "0";
+    public static final String ROLE_ALREADY_EXISTS = "1";
+    public static final String USER_NOT_FOUND = "2";
+    public static final String ROLE_NOT_FOUND = "3";
+    public static final String TELEGRAM_SEND_MESSAGE_ERROR = "4";
+    public static final String TELEGRAM_ID_NOT_FOUND = "5";
+    public static final String ROLE_PERMISSION_NOT_FOUND = "6";
+}

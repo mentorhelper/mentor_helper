@@ -1,0 +1,587 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Role id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: varchar(200)
+                  remarks: "Role name"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 2
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Unique user id"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(100)
+                  remarks: "User name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(100)
+                  remarks: "User last name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: country
+                  type: varchar(20)
+                  remarks: "User country"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registered_at
+                  type: timestamptz
+                  remarks: "User country"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_id
+                  type: integer
+                  remarks: "User telegram identifier"
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: telegram_nickname
+                  type: varchar(200)
+                  remarks: "User telegram nickname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: salary_per_hour
+                  type: integer
+                  remarks: "User salary per hour"
+              - column:
+                  name: salary_currency
+                  type: varchar(20)
+                  remarks: "User salary currency"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: secret_phrase
+                  type: varchar(50)
+                  remarks: "User salary currency"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: integer
+                  remarks: "User role id"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_role_id
+                    references: role(id)
+  - changeSet:
+      id: 3
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: group
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: varchar(100)
+                  remarks: "Group name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_created
+                  type: timestamptz
+                  remarks: "Created date"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_started
+                  type: timestamptz
+                  remarks: "Started date"
+              - column:
+                  name: date_finished
+                  type: timestamptz
+                  remarks: "Finished date"
+              - column:
+                  name: slack_url
+                  type: varchar(200)
+                  remarks: "Group slack url"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: students_count_on_start
+                  type: integer
+                  remarks: "Count users on start"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: students_count_on_end
+                  type: integer
+                  remarks: "Count users on end"
+              - column:
+                  name: hours_per_lecture
+                  type: integer
+                  remarks: "Hours per lecture"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 4
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: user_to_group
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: "User id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: group_id
+                  type: integer
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_group_id
+                    references: group(id)
+  - changeSet:
+      id: 5
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: group_to_weekend
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  remarks: "Group id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: number_of_day
+                  type: integer
+                  remarks: "Number of week day"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+  - changeSet:
+      id: 6
+      author: mckeydonelly
+      changes:
+        - createTable:
+            tableName: role_to_permission
+            columns:
+              - column:
+                  name: role_id
+                  type: bigint
+                  remarks: "Role id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: permission
+                  type: varchar(200)
+                  remarks: "Permission name"
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 7
+      author: anton_kupreychik
+      changes:
+        - createSequence:
+            sequenceName: role_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 8
+      author: mckeydonelly
+      changes:
+        - createSequence:
+            sequenceName: group_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 9
+      author: mckeydonelly
+      changes:
+        - createSequence:
+            sequenceName: user_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 10
+      author: danir
+      changes:
+        - createTable:
+            tableName: module
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "id of mentor"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: module_number
+                  type: bigint
+                  remarks: "number of module"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lecture_count
+                  type: integer
+                  remarks: "quantity of lectures"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  remarks: "name of module"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+                  remarks: "description"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_site
+                  type: varchar(500)
+                  remarks: "link to site"
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: lecture
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Unique id of lecture"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: module_id
+                  type: bigint
+                  remarks: "number of module"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_module_id
+                    references: module(id)
+              - column:
+                  name: name
+                  type: varchar(500)
+                  remarks: "topic of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(5000)
+                  remarks: "description of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_presentation
+                  type: varchar(500)
+                  remarks: "link to presentation"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_to_lesson
+                  type: varchar(500)
+                  remarks: "link to lesson"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locale
+                  type: varchar(20)
+                  remarks: "language of lecture"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: module_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+        - createSequence:
+            sequenceName: lecture_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 11
+      author: danir
+      changes:
+        - createTable:
+            tableName: timetable
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "id of schedule"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: bigint
+                  remarks: "id of group"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_group_id
+                    references: group(id)
+              - column:
+                  name: lecture_id
+                  type: bigint
+                  remarks: "id of lecture"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lecture_id
+                    references: lecture(id)
+              - column:
+                  name: start_datetime
+                  type: timestamptz
+                  remarks: "date and time of beginning of lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: finish_datetime
+                  type: timestamptz
+                  remarks: "date and time of finishing of lecture"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: timetable_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 12
+      author: danir
+      changes:
+        - createTable:
+            tableName: lecture_result
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "id of the result of lecture"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: lecture_id
+                  type: bigint
+                  remarks: "id of the group"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lecture_id
+                    references: lecture(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: "id of mentor"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_id
+                    references: user(id)
+              - column:
+                  name: hours_in_lecture
+                  type: bigint
+                  remarks: "duration of lecture(hours)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_user_leading
+                  type: boolean
+                  remarks: "if a user gave a lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: was_at_lecture
+                  type: boolean
+                  remarks: "if a mentor was present at a lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: other_user_was_on_lecture
+                  type: boolean
+                  remarks: "if a second mentor was present at a lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: other_user_hours_on_lecture
+                  type: boolean
+                  remarks: "how many hours second mentor was present at a lecture"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: text
+                  remarks: "comments"
+                  constraints:
+                    nullable: true
+        - createSequence:
+            sequenceName: lecture_result_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+        - createTable:
+            tableName: timetable_to_lecture_result
+            columns:
+              - column:
+                  name: timetable_id
+                  type: bigint
+                  remarks: "mentor's id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_timetable_id
+                    references: timetable(id)
+              - column:
+                  name: lecture_result_id
+                  type: bigint
+                  remarks: "number of the day of the week"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_lecture_result_id
+                    references: lecture_result(id)
+  - changeSet:
+      id: 13
+      author: romamku
+      changes:
+        - createTable:
+            tableName: bot_enter_history
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: attempt_datetime
+                  type: timestamptz
+                  remarks: "Attempt datetime"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_id
+                  type: integer
+                  remarks: "User telegram identifier"
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: telegram_nickname
+                  type: varchar(255)
+                  remarks: "User telegram nickname"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_firstname
+                  type: varchar(255)
+                  remarks: "User telegram firstname"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: telegram_lastname
+                  type: varchar(255)
+                  remarks: "User telegram lastname"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: command
+                  type: varchar(255)
+                  remarks: "Completed command"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: bot_enter_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 14
+      author: mckeydonelly
+      changes:
+        - dropNotNullConstraint:
+            columnDataType: integer
+            columnName: telegram_id
+            schemaName: public
+            tableName: user
+  - changeSet:
+      id: 15
+      author: mckeydonelly
+      changes:
+        - dropPrimaryKey:
+            tableName: role_to_permission
+        - addColumn:
+            tableName: role_to_permission
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Permission id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+        - createSequence:
+            sequenceName: role_permission_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
