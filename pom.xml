@@ -163,6 +163,13 @@
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>${surefireArgLine}</argLine>
+                    <systemPropertyVariables>
+                        <MENTOR_BOT_USERNAME>botName</MENTOR_BOT_USERNAME>
+                        <MENTOR_BOT_TOKEN>botToken</MENTOR_BOT_TOKEN>
+                        <DB_HOST_TEST>jdbc:tc:postgresql:14:///mentorhelperdb-test</DB_HOST_TEST>
+                        <DB_USER_TEST>test</DB_USER_TEST>
+                        <DB_PASSWORD_TEST>password</DB_PASSWORD_TEST>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
