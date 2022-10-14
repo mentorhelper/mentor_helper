@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.List;
+
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
@@ -104,5 +106,9 @@ public class UserServiceImpl implements UserService {
     private User fetchUser(Long id) throws GeneralException {
         return userRepository.findById(id)
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+    }
+
+    public List<User> listAll() {
+        return userRepository.findAll(Sort.by("firstName").ascending());
     }
 }

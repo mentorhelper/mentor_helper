@@ -6,6 +6,9 @@ import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.persist.model.User;
+
+import java.util.List;
 
 
 public interface UserService {
@@ -20,4 +23,8 @@ public interface UserService {
     void changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException;
 
     void sendMessage(UserMessageCommand userMessageCommand) throws GeneralException;
+
+    List<User> listAll();
+
+
 }
