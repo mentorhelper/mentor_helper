@@ -5,10 +5,10 @@ import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.exceptions.GeneralException;
-import com.ua.javarush.mentor.persist.model.User;
 
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 
 
 public interface UserService {
@@ -24,7 +24,5 @@ public interface UserService {
 
     void sendMessage(UserMessageCommand userMessageCommand) throws GeneralException;
 
-    List<User> listAll();
-
-
+    void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException;
 }

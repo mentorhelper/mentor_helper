@@ -1,15 +1,13 @@
 package com.ua.javarush.mentor.controller;
 
-import com.lowagie.text.DocumentException;
 import com.ua.javarush.mentor.command.UserCommand;
 import com.ua.javarush.mentor.command.UserMessageCommand;
 import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.exceptions.GeneralException;
-import com.ua.javarush.mentor.persist.model.User;
-import com.ua.javarush.mentor.reports.UserPDFExporter;
 import com.ua.javarush.mentor.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,11 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 
 @RestController
@@ -165,18 +158,20 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/USER/export/pdf")
-    public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
-        response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
-        response.setHeader(headerKey, headerValue);
-
-        List<User> listUsers = userService.listAll();
-        UserPDFExporter exporter = new UserPDFExporter(listUsers);
-        exporter.export(response);
+    @GetMapping("/export/pdf")
+    @Operation(
+            summary = "Generate pdf",
+            description = "Generate pdf about all users. Available languages: EN, RU",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))}
+    )
+    public ResponseEntity<Void> exportToPDF(HttpServletResponse response,
+                                            AppLocale appLocale) throws GeneralException {
+        userService.exportToPDF(response, appLocale);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

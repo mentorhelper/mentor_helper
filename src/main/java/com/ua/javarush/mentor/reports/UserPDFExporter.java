@@ -8,16 +8,52 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
-import com.ua.javarush.mentor.persist.model.User;
+import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.enums.AppLocale;
+import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.exceptions.UiError;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
+import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
+
+@Service
 public class UserPDFExporter {
-    private List<User> listUsers;
 
-    public UserPDFExporter(List<User> listUsers) {
-        this.listUsers = listUsers;
+    private static final String CANNOT_CREATE_USER_REPORT = "Cannot create user report";
+    private static final int FONT_SIZE = 18;
+    private static final int NUM_COLUMNS = 6;
+    private static final float WIDTH_PERCENTAGE = 100f;
+    private static final int SPACING = 10;
+
+    private final float[] columnWidths = new float[]{3.5f, 3.5f, 2.0f, 1.5f, 3.5f, 2.0f};
+    private final MessageSource messageSource;
+
+    public UserPDFExporter(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 
-    private void writeTableHeader (PdfPTable table) {
+    public void export(HttpServletResponse response, List<UserDTO> users, AppLocale appLocale) throws GeneralException {
+        try (Document document = new Document(PageSize.A4)) {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+
+            Paragraph paragraph = generateParagraph("report.user.reportName", appLocale, generateDefaultFont());
+            document.add(paragraph);
+
+            PdfPTable table = generateTable();
+            writeTableHeader(table, appLocale);
+            writeTableData(table, users);
+
+            document.add(table);
+        } catch (IOException e) {
+            throw createGeneralException(CANNOT_CREATE_USER_REPORT, HttpStatus.BAD_REQUEST, UiError.PDF_EXPORT_ERROR);
+        }
+    }
+
+    private void writeTableHeader(PdfPTable table, AppLocale appLocale) {
         PdfPCell cell = new PdfPCell();
         cell.setBackgroundColor(Color.LIGHT_GRAY);
         cell.setPadding(5);
@@ -25,60 +61,48 @@ public class UserPDFExporter {
         Font font = FontFactory.getFont(FontFactory.HELVETICA);
         font.setColor(Color.WHITE);
 
-        cell.setPhrase(new Phrase("First Name", font));
-        table.addCell(cell);
+        addCell(cell, "report.user.firstName", appLocale, table, font);
+        addCell(cell, "report.user.lastName", appLocale, table, font);
+        addCell(cell, "report.user.country", appLocale, table, font);
+        addCell(cell, "report.user.registrationDate", appLocale, table, font);
+        addCell(cell, "report.user.telegramNickname", appLocale, table, font);
+        addCell(cell, "report.user.roleName", appLocale, table, font);
+    }
 
-        cell.setPhrase(new Phrase("Last Name", font));
-        table.addCell(cell);
-
-        cell.setPhrase((new Phrase("Country", font)));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Registered_at", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Telegram nickname", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Role id", font));
+    private void addCell(PdfPCell cell, String resourceName, AppLocale appLocale, PdfPTable table, Font font) {
+        cell.setPhrase(new Phrase(messageSource.getMessage(resourceName, null, appLocale.getLocaleObject()), font));
         table.addCell(cell);
     }
 
-    private void writeTableData (PdfPTable table) {
-        for (User user : listUsers) {
+    private void writeTableData(PdfPTable table, List<UserDTO> users) {
+        users.forEach(user -> {
             table.addCell(user.getFirstName());
             table.addCell(user.getLastName());
             table.addCell(user.getCountry());
-            table.addCell(String.valueOf(user.getRegisteredAt()));
+            table.addCell(user.getRegisteredAt());
             table.addCell(user.getTelegramNickname());
-            table.addCell(String.valueOf(user.getRoleId()));
-        }
+            table.addCell(user.getRoleName());
+        });
     }
 
-    public void export (HttpServletResponse response) throws  DocumentException, IOException {
-        Document document = new Document(PageSize.A4);
-        PdfWriter.getInstance(document, response.getOutputStream());
+    private Paragraph generateParagraph(String paragraphName, AppLocale appLocale, Font font) {
+        Paragraph paragraph = new Paragraph(messageSource.getMessage(paragraphName, null, appLocale.getLocaleObject()), font);
+        paragraph.setAlignment(Element.ALIGN_CENTER);
+        return paragraph;
+    }
 
-        document.open();
+    private Font generateDefaultFont() {
         Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-        font.setSize(18);
+        font.setSize(FONT_SIZE);
         font.setColor(Color.BLACK);
+        return font;
+    }
 
-        Paragraph p = new Paragraph("USER REPORT", font);
-        p.setAlignment(Paragraph.ALIGN_CENTER);
-
-        document.add(p);
-
-        PdfPTable table = new PdfPTable(6);
-        table.setWidthPercentage(100f);
-        table.setWidths(new float[] {3.5f, 3.5f, 2.0f, 1.5f, 3.5f, 2.0f});
-        table.setSpacingBefore(10);
-
-        writeTableHeader(table);
-        writeTableData(table);
-
-        document.add(table);
-
-        document.close();
+    private PdfPTable generateTable() {
+        PdfPTable table = new PdfPTable(NUM_COLUMNS);
+        table.setWidthPercentage(WIDTH_PERCENTAGE);
+        table.setWidths(columnWidths);
+        table.setSpacingBefore(SPACING);
+        return table;
     }
 }

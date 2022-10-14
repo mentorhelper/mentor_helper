@@ -1,7 +1,7 @@
 package com.ua.javarush.mentor.controller;
 
 import com.ua.javarush.mentor.dto.ErrorDTO;
-import com.ua.javarush.mentor.exceptions.Error;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.ErrorMapper;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -28,7 +28,7 @@ public class ExceptionHandlerController {
         log.error("GeneralException with message: '{}'", e.getMessage());
         return ResponseEntity
                 .status(e.getHttpStatus())
-                .body(errorMapper.mapToDto(e.getErrors()));
+                .body(errorMapper.mapToDto(e.getUiErrors()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -36,6 +36,6 @@ public class ExceptionHandlerController {
         log.error("Exception with message: '{}'", e.getMessage());
         return ResponseEntity
                 .status(500)
-                .body(List.of(errorMapper.mapToDto(Error.APPLICATION_ERROR)));
+                .body(List.of(errorMapper.mapToDto(UiError.APPLICATION_ERROR)));
     }
 }
