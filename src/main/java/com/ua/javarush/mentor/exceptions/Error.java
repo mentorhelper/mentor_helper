@@ -17,6 +17,8 @@ public enum Error {
     EMAIL_SEND_ERROR(ErrorCode.EMAIL_SEND_ERROR, "Email send error"),
     TOKEN_NOT_VALID(ErrorCode.TOKEN_NOT_VALID, "Token not valid"),
     TOKEN_EXPIRED(ErrorCode.TOKEN_EXPIRED, "Token expired"),
+    UNABLE_TO_PARSE_JSON(ErrorCode.UNABLE_TO_PARSE_JSON, "Unable to parse json"),
+    UNABLE_TO_CREATE_JSON(ErrorCode.UNABLE_TO_CREATE_JSON, "Unable to create json"),
     APPLICATION_ERROR(ErrorCode.APPLICATION_ERROR, "Application error");
 
     private final String code;

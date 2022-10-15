@@ -623,4 +623,41 @@ databaseChangeLog:
                   remarks: "Date of sending email confirmation"
                   constraints:
                     nullable: true
-
+  - changeSet:
+      id: 17
+      author: antonKupreychik
+      changes:
+        - createTable:
+            tableName: notifications
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: notification_provider
+                  type: varchar(255)
+                  remarks: "Notification provider"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: text
+                  remarks: "Notification data"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_sending
+                  type: timestamptz
+                  remarks: "Date of sending"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: notifications_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
