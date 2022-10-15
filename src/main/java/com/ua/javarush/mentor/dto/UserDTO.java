@@ -31,8 +31,6 @@ public class UserDTO {
     private Integer salaryPerHour;
     @Schema(description = "Salary currency")
     private String salaryCurrency;
-    @Schema(description = "Secret phrase")
-    private String secretPhrase;
     @Schema(description = "Role name")
     private String roleName;
 }

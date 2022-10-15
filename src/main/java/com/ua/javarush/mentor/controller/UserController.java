@@ -154,4 +154,43 @@ public class UserController {
         userService.sendMessage(userMessageCommand);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+    @GetMapping("/{email}/confirmation")
+    @Operation(summary = "Send confirmation email",
+            description = "Send confirmation email",
+            parameters = {
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> sendConfirmationEmail(@PathVariable("email") String email) throws GeneralException {
+        userService.sendConfirmationEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/email/confirm/{token}/{email}")
+    @Operation(summary = "Confirm email",
+            description = "Confirm email",
+            parameters = {
+                    @Parameter(name = "token", description = "Token", required = true),
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> confirmEmail(@PathVariable("token") String token,
+                                             @PathVariable("email") String email) throws GeneralException {
+        userService.confirmEmail(token, email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

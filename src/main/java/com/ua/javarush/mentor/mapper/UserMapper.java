@@ -24,7 +24,6 @@ public abstract class UserMapper implements Converter {
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
-    @Mapping(target = "secretPhrase", source = "secretPhrase")
     @Mapping(target = "roleName", expression = "java(user.getRoleId().getName())")
     public abstract UserDTO mapToDto(User user);
 
@@ -35,7 +34,6 @@ public abstract class UserMapper implements Converter {
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
-    @Mapping(target = "secretPhrase", source = "secretPhrase")
     @Mapping(target = "roleId", expression = "java(roleService.fetchRole(userCommand.getRoleId()))")
     public abstract User mapToEntity(UserCommand userCommand) throws GeneralException;
 }

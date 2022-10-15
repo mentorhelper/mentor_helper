@@ -20,4 +20,8 @@ public interface UserService {
     void changePermission(UserPermissionCommand userPermissionCommand) throws GeneralException;
 
     void sendMessage(UserMessageCommand userMessageCommand) throws GeneralException;
+
+    void sendConfirmationEmail(String email) throws GeneralException;
+
+    void confirmEmail(String token, String email) throws GeneralException;
 }

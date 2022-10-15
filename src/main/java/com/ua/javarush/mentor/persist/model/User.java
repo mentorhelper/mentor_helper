@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -39,6 +40,25 @@ public class User implements Serializable {
     private String salaryCurrency;
     @Column(name = "SECRET_PHRASE", length = 50, nullable = false)
     private String secretPhrase;
+
+    @Column(name = "EMAIL", length = 50)
+    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = "Invalid email")
+    private String email;
+
+    @Column(name = "EMAIL_VERIFIED")
+    private boolean emailVerified;
+
+    @Column(name = "EMAIL_VERIFICATION_TOKEN", length = 100)
+    private String emailConfirmationToken;
+
+    @Column(name = "DATE_OF_CONFIRMATION_EMAIL")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateOfConfirmationEmail;
+
+    @Column(name = "DATE_OF_SENDING_EMAIL_CONFIRMATION")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateOfSendingEmailConfirmation;
+
     @OneToOne
     @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID", nullable = false)
     private Role roleId;
