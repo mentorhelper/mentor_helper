@@ -162,7 +162,8 @@ public class UserServiceImpl implements UserService {
 
     private SendEmailCommand createSendEmailCommand(User user, AppLocale appLocale) {
         return emailService.buildEmail(user.getEmail(), appLocale, EmailTemplates.CONFIRMATION,
-                Map.of("confirmationLink", createConfirmationLink(user)));
+                Map.of("confirmationLink", createConfirmationLink(user),
+                        "firstName", user.getFirstName()));
     }
 
     private String createConfirmationLink(User user) {

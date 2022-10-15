@@ -18,4 +18,6 @@ public class ErrorCode {
     public static final String EMAIL_SEND_ERROR = "7";
     public static final String TOKEN_NOT_VALID = "8";
     public static final String TOKEN_EXPIRED = "9";
+    public static final String UNABLE_TO_PARSE_JSON = "10";
+    public static final String UNABLE_TO_CREATE_JSON = "11";
 }
