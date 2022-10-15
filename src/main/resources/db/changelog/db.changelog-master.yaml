@@ -585,3 +585,42 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
+  - changeSet:
+      id: 16
+      author: antonKupreychik
+      changes:
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: email
+                  type: varchar(50)
+                  remarks: "User email"
+                  constraints:
+                    unique: true
+                    nullable: true
+              - column:
+                  name: email_verified
+                  type: boolean
+                  remarks: "Is user email verified"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: email_verification_token
+                  type: varchar(255)
+                  remarks: "User email verification token"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_of_confirmation_email
+                  type: timestamptz
+                  remarks: "Date of confirmation email"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_of_sending_email_confirmation
+                  type: timestamptz
+                  remarks: "Date of sending email confirmation"
+                  constraints:
+                    nullable: true
+

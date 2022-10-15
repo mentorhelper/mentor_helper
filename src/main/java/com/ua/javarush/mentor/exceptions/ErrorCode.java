@@ -15,4 +15,7 @@ public class ErrorCode {
     public static final String TELEGRAM_SEND_MESSAGE_ERROR = "4";
     public static final String TELEGRAM_ID_NOT_FOUND = "5";
     public static final String ROLE_PERMISSION_NOT_FOUND = "6";
+    public static final String EMAIL_SEND_ERROR = "7";
+    public static final String TOKEN_NOT_VALID = "8";
+    public static final String TOKEN_EXPIRED = "9";
 }
