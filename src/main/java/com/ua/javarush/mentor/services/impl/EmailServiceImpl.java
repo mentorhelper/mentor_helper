@@ -71,6 +71,25 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendResetPasswordEmail(SendEmailCommand sendEmailCommand) throws GeneralException {
+        log.info("Sending reset password email to {}", sendEmailCommand.getEmail());
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            mimeMessage.setFrom(username);
+            mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendEmailCommand.getEmail()));
+            mimeMessage.setSubject(messageSource.getMessage(sendEmailCommand.getEmailTemplate().getSubject(), null, sendEmailCommand.getLocale().getLocaleObject()));
+            mimeMessage.setContent(generateMailContent(getEmailContent(sendEmailCommand)));
+            mailSender.send(mimeMessage);
+            log.info("Send mail to {}", sendEmailCommand.getEmail());
+
+            notificationService.saveNotification(notificationService.createNotification(sendEmailCommand, NotificationProvider.EMAIL));
+        } catch (Exception e) {
+            log.error("Error send email to " + sendEmailCommand.getEmail() + ". " + e.getLocalizedMessage());
+            throw createGeneralException("Cannot send email", HttpStatus.NOT_FOUND, Error.EMAIL_SEND_ERROR);
+        }
+    }
+
+    @Override
     public SendEmailCommand buildEmail(String email, AppLocale appLocale, EmailTemplates emailTemplates, Map<String, String> newParams) {
         return SendEmailCommand.builder()
                 .email(email)

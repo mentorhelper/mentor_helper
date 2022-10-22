@@ -17,6 +17,8 @@ public enum Error {
     EMAIL_SEND_ERROR(ErrorCode.EMAIL_SEND_ERROR, "Email send error"),
     TOKEN_NOT_VALID(ErrorCode.TOKEN_NOT_VALID, "Token not valid"),
     TOKEN_EXPIRED(ErrorCode.TOKEN_EXPIRED, "Token expired"),
+    CODE_NOT_VALID(ErrorCode.CODE_NOT_VALID, "Code not valid"),
+    CODE_EXPIRED(ErrorCode.CODE_EXPIRED, "Code expired"),
     UNABLE_TO_PARSE_JSON(ErrorCode.UNABLE_TO_PARSE_JSON, "Unable to parse json"),
     UNABLE_TO_CREATE_JSON(ErrorCode.UNABLE_TO_CREATE_JSON, "Unable to create json"),
     PASSWORD_NOT_VALID(ErrorCode.PASSWORD_NOT_VALID, "Password not valid"),
@@ -26,6 +28,8 @@ public enum Error {
     COUNTRY_NOT_SET(ErrorCode.COUNTRY_NOT_SET, "Country not set"),
     USER_EMAIL_ALREADY_EXISTS(ErrorCode.USER_EMAIL_ALREADY_EXISTS, "User email already exists"),
     USERNAME_ALREADY_EXISTS(ErrorCode.USERNAME_ALREADY_EXISTS, "Username already exists"),
+    MAX_COUNT_OF_RESET_PASSWORD_REACHED(ErrorCode.MAX_COUNT_OF_RESET_PASSWORD_REACHED, "Max count of reset password reached"),
+    OLD_PASSWORD_NOT_VALID(ErrorCode.OLD_PASSWORD_NOT_VALID, "Old password not valid"),
     APPLICATION_ERROR(ErrorCode.APPLICATION_ERROR, "Application error");
 
     private final String code;

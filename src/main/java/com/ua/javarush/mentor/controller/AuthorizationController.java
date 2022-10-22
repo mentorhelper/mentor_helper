@@ -3,9 +3,13 @@ package com.ua.javarush.mentor.controller;
 import com.ua.javarush.mentor.command.LoginCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.DeviceType;
+import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.AuthorizationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +33,15 @@ public class AuthorizationController {
     }
 
     @PostMapping("/login")
-    @Operation(description = "Login", tags = "Authorization")
+    @Operation(summary = "Login",
+            description = "Login user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Login success", content =
+                    @Content(schema = @Schema(implementation = UserDTO.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = Error.class)))
+            },
+            tags = "Authorization")
     public ResponseEntity<UserDTO> login(@RequestHeader(value = "APP_DEVICE_TYPE", required = false, defaultValue = "WEB") DeviceType deviceType,
                                          @RequestBody @Valid LoginCommand loginCommand) throws GeneralException {
         UserDTO user = authorizationService.login(loginCommand.getEmail(), loginCommand.getPassword(), deviceType);
@@ -38,7 +50,15 @@ public class AuthorizationController {
     }
 
     @PostMapping("/refresh-tokens")
-    @Operation(description = "Get new tokens", tags = "Authorization")
+    @Operation(summary = "Get new tokens",
+            description = "Get new tokens",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Get new tokens success", content =
+                    @Content(schema = @Schema(implementation = UserDTO.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content =
+                    @Content(schema = @Schema(implementation = Error.class)))
+            },
+            tags = "Authorization")
     public ResponseEntity<UserDTO> refreshTokens(@RequestHeader(value = "APP_DEVICE_TYPE", required = false, defaultValue = "WEB") DeviceType deviceType,
                                                  @CookieValue("refresh_token") String refreshToken) throws GeneralException {
 
@@ -52,5 +72,4 @@ public class AuthorizationController {
         headers.add("Set-Cookie", "refresh_token=" + refreshToken.toString() + "; Max-Age=864000; Path=/; SameSite=None; Secure; HttpOnly;");
         return headers;
     }
-
 }

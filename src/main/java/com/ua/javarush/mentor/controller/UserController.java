@@ -1,8 +1,6 @@
 package com.ua.javarush.mentor.controller;
 
-import com.ua.javarush.mentor.command.UserCommand;
-import com.ua.javarush.mentor.command.UserMessageCommand;
-import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
@@ -19,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 
 @RestController
@@ -198,6 +198,55 @@ public class UserController {
     public ResponseEntity<Void> confirmEmail(@PathVariable("token") String token,
                                              @PathVariable("email") String email) throws GeneralException {
         userService.confirmEmail(token, email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/password/reset/{email}")
+    @Operation(summary = "Reset password, ask email code",
+            description = "Reset password",
+            parameters = {
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> resetPassword(@PathVariable("email") String email) throws GeneralException {
+        userService.resetPassword(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/password/reset/confirm")
+    @Operation(summary = "Reset password with code",
+            description = "Reset password with code",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> resetPasswordWithCode(@RequestBody ResetPasswordCommand resetPasswordCommand) throws GeneralException {
+        userService.confirmResetPassword(resetPasswordCommand);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/password/change")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Change password",
+            description = "Change password",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException {
+        userService.changePassword(changePasswordCommand, principal);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

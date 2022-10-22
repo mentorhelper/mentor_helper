@@ -28,6 +28,7 @@ public class SecurityConfig {
     private static final String AUTH_ENDPOINTS = "/auth/**";
     private static final String REGISTER_ENDPOINTS = "/user/create";
     public static final String EMAIL_ENDPOINTS = "/user/email/confirm/**";
+    public static final String RESET_PASSWORD_ENDPOINTS = "/user/password/reset/**";
     private static final String[] OPEN_API_ENDPOINTS = {
             "/v3/api-docs/**",
             "/swagger-ui/**"};
@@ -68,6 +69,7 @@ public class SecurityConfig {
                 .antMatchers(REGISTER_ENDPOINTS).permitAll()
                 .antMatchers(OPEN_API_ENDPOINTS).permitAll()
                 .antMatchers(EMAIL_ENDPOINTS).permitAll()
+                .antMatchers(RESET_PASSWORD_ENDPOINTS).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
