@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 
 @Data
 @Builder
@@ -33,4 +35,8 @@ public class UserDTO {
     private String salaryCurrency;
     @Schema(description = "Role name")
     private String roleName;
+    @Schema(description = "Access token")
+    private String accessToken;
+    @Schema(description = "Session expired date")
+    private Instant sessionExpiredDate;
 }

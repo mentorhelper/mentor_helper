@@ -661,3 +661,87 @@ databaseChangeLog:
             startValue: 1
             minValue: 1
             maxValue: 9223372036854775807
+  - changeSet:
+      id: 18
+      author: antonKupreychik
+      changes:
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: username
+                  type: varchar(255)
+                  remarks: "Notification provider"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: password
+                  type: text
+                  remarks: "Notification data"
+                  constraints:
+                    nullable: true
+        - createTable:
+            tableName: refresh_session
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: "User id"
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_id
+                    references: user(id)
+              - column:
+                  name: token
+                  type: text
+                  remarks: "Token"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_creation
+                  type: timestamptz
+                  remarks: "Date of creation"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_expiration
+                  type: timestamptz
+                  remarks: "Date of expiration"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: refresh_session_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+  - changeSet:
+      id: 19
+      author: antonKupreychik
+      changes:
+        - addColumn:
+            tableName: refresh_session
+            columns:
+              - column:
+                  name: device_type
+                  type: varchar(255)
+                  remarks: "Device type"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: fingerprint
+                  type: varchar(255)
+                  remarks: "Fingerprint"
+                  constraints:
+                    nullable: true
+
+
+
+

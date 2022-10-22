@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class UserController {
     }
 
     @GetMapping("")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get all users",
             description = "Get all users",
             parameters = {
@@ -77,6 +79,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get user by id",
             description = "Get user by id",
             parameters = {
@@ -97,6 +100,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete user by id",
             description = "Delete user by id",
             parameters = {
@@ -118,6 +122,7 @@ public class UserController {
     }
 
     @PostMapping("/permission")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Add permission to user",
             description = "Add permission to user",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -137,6 +142,7 @@ public class UserController {
     }
 
     @PostMapping("/message")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Send message to user",
             description = "Send message to user",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -157,6 +163,7 @@ public class UserController {
 
 
     @GetMapping("/{email}/confirmation")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Send confirmation email",
             description = "Send confirmation email",
             parameters = {

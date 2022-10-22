@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +27,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(GeneralException.class)
     public ResponseEntity<List<ErrorDTO>> handleGeneralException(GeneralException e) {
         log.error("GeneralException with message: '{}'", e.getMessage());
+        log.error(Arrays.toString(e.getStackTrace()));
         return ResponseEntity
                 .status(e.getHttpStatus())
                 .body(errorMapper.mapToDto(e.getErrors()));
@@ -34,6 +36,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<List<ErrorDTO>> handleException(Exception e) {
         log.error("Exception with message: '{}'", e.getMessage());
+        log.error(Arrays.toString(e.getStackTrace()));
         return ResponseEntity
                 .status(500)
                 .body(List.of(errorMapper.mapToDto(Error.APPLICATION_ERROR)));

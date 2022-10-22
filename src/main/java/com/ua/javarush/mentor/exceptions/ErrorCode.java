@@ -20,4 +20,5 @@ public class ErrorCode {
     public static final String TOKEN_EXPIRED = "9";
     public static final String UNABLE_TO_PARSE_JSON = "10";
     public static final String UNABLE_TO_CREATE_JSON = "11";
+    public static final String PASSWORD_NOT_VALID = "12";
 }

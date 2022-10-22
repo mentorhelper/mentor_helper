@@ -1,7 +1,7 @@
 package com.ua.javarush.mentor.persist.model;
 
 public enum PermissionType {
-    CREATE,
+    CREATING_USERS,
     ADD,
     REMOVE
 }

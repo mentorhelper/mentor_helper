@@ -10,6 +10,7 @@ import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.enums.EmailTemplates;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.mapper.UserDetailsMapper;
 import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
@@ -26,20 +27,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private static final String USER_CONFIRM_PATH = "/user/email/confirm/";
     private static final String SLASH = "/";
@@ -58,14 +61,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserDetailsMapper userDetailsMapper;
     private final RoleService roleService;
     private final TelegramService telegramService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.userDetailsMapper = userDetailsMapper;
         this.roleService = roleService;
         this.telegramService = telegramService;
         this.emailService = emailService;
@@ -73,12 +78,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        UserDetails userDetails = userDetailsMapper.mapToUserDetails(user.get());
+        new AccountStatusUserDetailsChecker().check(userDetails);
+        return userDetails;
+    }
+
+    @Override
+    public void matchPassword(User user, String password) throws GeneralException {
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+        }
+    }
+
+    @Override
+    public UserDTO findUserById(Long id) throws GeneralException {
+        return userMapper.mapToDto(userRepository.findById(id)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND)));
+    }
+
+    @Override
+    public User findUserByEmail(String email) throws GeneralException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+    }
+
+    @Override
     @Transactional(rollbackFor = GeneralException.class)
     public UserDTO createUser(UserCommand userCommand) throws GeneralException {
         User newUser = userMapper.mapToEntity(userCommand);
         newUser.setSecretPhrase(generateSecretPhrase());
+        newUser.setPassword(bCryptPasswordEncoder.encode(userCommand.getPassword()));
         userRepository.save(newUser);
         log.info(LOG_USER_WAS_CREATED, newUser.getFirstName(), newUser.getLastName());
+        sendConfirmationEmail(newUser.getEmail());
         return userMapper.mapToDto(newUser);
     }
 
@@ -184,5 +222,12 @@ public class UserServiceImpl implements UserService {
     private User fetchUser(Long id) throws GeneralException {
         return userRepository.findById(id)
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+    }
+
+    @Override
+    public UserDetails loadUserDetailsByUserId(Long id) throws GeneralException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+        return userDetailsMapper.mapToUserDetails(user);
     }
 }

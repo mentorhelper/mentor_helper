@@ -22,4 +22,9 @@ public class UserCommand {
     private Long roleId;
     @Schema(description = "Email")
     private String email;
+    @Schema(description = "Password")
+    private String password;
+    @Schema(description = "Username")
+    private String username;
+
 }

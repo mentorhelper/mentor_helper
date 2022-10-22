@@ -19,6 +19,7 @@ public enum Error {
     TOKEN_EXPIRED(ErrorCode.TOKEN_EXPIRED, "Token expired"),
     UNABLE_TO_PARSE_JSON(ErrorCode.UNABLE_TO_PARSE_JSON, "Unable to parse json"),
     UNABLE_TO_CREATE_JSON(ErrorCode.UNABLE_TO_CREATE_JSON, "Unable to create json"),
+    PASSWORD_NOT_VALID(ErrorCode.PASSWORD_NOT_VALID, "Password not valid"),
     APPLICATION_ERROR(ErrorCode.APPLICATION_ERROR, "Application error");
 
     private final String code;
