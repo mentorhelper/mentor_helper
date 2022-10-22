@@ -741,6 +741,150 @@ databaseChangeLog:
                   remarks: "Fingerprint"
                   constraints:
                     nullable: false
+  - changeSet:
+      id: 20
+      author: antonKupreychik
+      changes:
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: date_of_sending_reset_password
+                  type: timestamptz
+                  remarks: "Date of sending reset password"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_of_reset_password
+                  type: timestamptz
+                  remarks: "Date of reset password"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: reset_password_code
+                  type: varchar(255)
+                  remarks: "Reset password code"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: count_of_reset_password
+                  type: integer
+                  remarks: "Count of attempts to reset password"
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 21
+      author: antonKupreychik
+      changes:
+        - createTable:
+            tableName: config
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  remarks: "Id"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  remarks: "name"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(255)
+                  remarks: "value"
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: config_seq
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
+            maxValue: 9223372036854775807
+        - insert:
+            tableName: config
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: name
+                  value: MAX_COUNT_OF_RESET_PASSWORD
+              - column:
+                  name: value
+                  value: 3
+  - changeSet:
+      id: 22
+      author: antonKupreychik
+      changes:
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: name
+                  value: ADMIN
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: name
+                  value: MENTOR
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  value: 3
+              - column:
+                  name: name
+                  value: ACCOUNTANT
+        - insert:
+            tableName: config
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: name
+                  value: TIME_TO_RESET_PASSWORD
+              - column:
+                  name: value
+                  value: 300
+        - insert:
+            tableName: config
+            columns:
+              - column:
+                  name: id
+                  value: 3
+              - column:
+                  name: name
+                  value: TIME_TO_CONFIRM_EMAIL
+              - column:
+                  name: value
+                  value: 30
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: last_password_change
+                  type: timestamptz
+                  remarks: "Last password change"
+                  constraints:
+                    nullable: true
+
+
+
+
+
 
 
 

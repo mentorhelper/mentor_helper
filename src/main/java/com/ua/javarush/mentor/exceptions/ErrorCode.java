@@ -27,4 +27,8 @@ public class ErrorCode {
     public static final String COUNTRY_NOT_SET = "16";
     public static final String USER_EMAIL_ALREADY_EXISTS = "17";
     public static final String USERNAME_ALREADY_EXISTS = "18";
+    public static final String MAX_COUNT_OF_RESET_PASSWORD_REACHED = "19";
+    public static final String OLD_PASSWORD_NOT_VALID = "20";
+    public static final String CODE_NOT_VALID = "21";
+    public static final String CODE_EXPIRED = "22";
 }

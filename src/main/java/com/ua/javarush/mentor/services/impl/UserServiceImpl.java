@@ -1,12 +1,10 @@
 package com.ua.javarush.mentor.services.impl;
 
-import com.ua.javarush.mentor.command.SendEmailCommand;
-import com.ua.javarush.mentor.command.UserCommand;
-import com.ua.javarush.mentor.command.UserMessageCommand;
-import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.AppLocale;
+import com.ua.javarush.mentor.enums.Configs;
 import com.ua.javarush.mentor.enums.EmailTemplates;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
@@ -14,9 +12,11 @@ import com.ua.javarush.mentor.mapper.UserDetailsMapper;
 import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
+import com.ua.javarush.mentor.persist.repository.ConfigRepository;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
 import com.ua.javarush.mentor.services.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.*;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
@@ -44,7 +45,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private static final String USER_CONFIRM_PATH = "/user/email/confirm/";
     private static final String SLASH = "/";
     private static final String TOKEN_EXPIRED = "Token expired";
+    private static final String CODE_EXPIRED = "Code expired";
     private static final String TOKEN_IS_NOT_VALID = "Token is not valid";
+    private static final String CODE_IS_NOT_VALID = "Code is not valid";
     private static final String USER_WITH_EMAIL = "User with email ";
     private static final String NOT_FOUND = " not found";
     public static final String LOG_CHANGE_PERMISSION_USER_TO = "Change permission user {} {} to {}";
@@ -52,11 +55,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public static final String LOG_USER_WAS_CREATED = "User '{} {}' was created";
     public static final String LOG_REMOVE_USER_ID_NAME = "Remove user: id={}, name={} {}";
     public static final String NOT_FOUND_USER_ERROR = "Didn't found user";
-    private static final int TIME_TO_CONFIRM_EMAIL = 30;
+
     @Value("${app.host}")
     private String host;
 
     private final UserRepository userRepository;
+    private final ConfigRepository configRepository;
     private final UserMapper userMapper;
     private final UserDetailsMapper userDetailsMapper;
     private final RoleService roleService;
@@ -65,8 +69,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, ConfigRepository configRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.configRepository = configRepository;
         this.userMapper = userMapper;
         this.userDetailsMapper = userDetailsMapper;
         this.roleService = roleService;
@@ -93,12 +98,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
         }
-    }
-
-    @Override
-    public UserDTO findUserById(Long id) throws GeneralException {
-        return userMapper.mapToDto(userRepository.findById(id)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND)));
     }
 
     @Override
@@ -172,20 +171,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void sendConfirmationEmail(String email) throws GeneralException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> createGeneralException(USER_WITH_EMAIL + email + NOT_FOUND, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+        User user = findUserByEmail(email);
         emailService.sendConfirmationEmail(createSendEmailCommand(user, AppLocale.EN));
         userRepository.save(user);
         log.info("Confirmation email was sent to user: {} {}", user.getFirstName(), user.getLastName());
     }
 
     @Override
+    @Transactional(rollbackFor = GeneralException.class, propagation = Propagation.REQUIRES_NEW)
     public void confirmEmail(String token, String email) throws GeneralException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> createGeneralException(USER_WITH_EMAIL + email + NOT_FOUND, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+        User user = findUserByEmail(email);
         if (bCryptPasswordEncoder.matches(token, user.getEmailConfirmationToken())) {
             if (Date.from(addTimeInMinutesToDate(user.getDateOfSendingEmailConfirmation(),
-                    TIME_TO_CONFIRM_EMAIL).toInstant()).after(new Date())) {
+                    Integer.parseInt(configRepository.findByName(Configs.TIME_TO_CONFIRM_EMAIL.name()).getValue())).toInstant()).after(new Date())) {
                 user.setEmailVerified(true);
                 user.setEmailConfirmationToken(null);
                 user.setDateOfConfirmationEmail(new Date());
@@ -200,6 +198,85 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = GeneralException.class, propagation = Propagation.REQUIRES_NEW)
+    public void resetPassword(String email) throws GeneralException {
+        User user = findUserByEmail(email);
+        if (availableToChangePassword(user)) {
+            Integer code = generateSixDigitCode();
+            user.setResetPasswordCode(bCryptPasswordEncoder.encode(String.valueOf(code)));
+            user.setDateOfResetPassword(new Date());
+            user.setCountOfResetPassword(incrementAndGet(user));
+            userRepository.save(user);
+            emailService.sendResetPasswordEmail(createSendResetPasswordEmailCommand(user, AppLocale.EN, code));
+            log.info("Reset password email was sent to user: {} {}", user.getFirstName(), user.getLastName());
+        } else {
+            throw createGeneralException("Max count of reset password reached", HttpStatus.BAD_REQUEST, Error.MAX_COUNT_OF_RESET_PASSWORD_REACHED);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = GeneralException.class, propagation = Propagation.REQUIRES_NEW)
+    public void changePassword(ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException {
+        User user = getUserByPrincipal(principal);
+        if (bCryptPasswordEncoder.matches(changePasswordCommand.getOldPassword(), user.getPassword())) {
+            if (validationService.isValidPassword(changePasswordCommand.getNewPassword())) {
+                user.setPassword(bCryptPasswordEncoder.encode(changePasswordCommand.getNewPassword()));
+                user.setLastPasswordChange(new Date());
+                userRepository.save(user);
+                log.info("Password was changed for user: {} {}", user.getFirstName(), user.getLastName());
+            } else {
+                throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+            }
+        } else {
+            throw createGeneralException("Old password is not valid", HttpStatus.BAD_REQUEST, Error.OLD_PASSWORD_NOT_VALID);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = GeneralException.class, propagation = Propagation.REQUIRES_NEW)
+    public void confirmResetPassword(ResetPasswordCommand resetPasswordCommand) throws GeneralException {
+        User user = findUserByEmail(resetPasswordCommand.getEmail());
+        if (bCryptPasswordEncoder.matches(resetPasswordCommand.getCode(), user.getResetPasswordCode())) {
+            if (Date.from(addTimeInMinutesToDate(user.getDateOfResetPassword(),
+                    Integer.parseInt(configRepository.findByName(Configs.TIME_TO_RESET_PASSWORD.name()).getValue())).toInstant()).after(new Date())) {
+                if (validationService.isValidPassword(resetPasswordCommand.getNewPassword())) {
+                    user.setPassword(bCryptPasswordEncoder.encode(resetPasswordCommand.getNewPassword()));
+                    user.setResetPasswordCode(null);
+                    user.setCountOfResetPassword(0);
+                    user.setDateOfSendingResetPassword(null);
+                    user.setLastPasswordChange(new Date());
+                    user.setDateOfResetPassword(new Date());
+                    userRepository.save(user);
+                    log.info("Password was reset for user: {} {}", user.getFirstName(), user.getLastName());
+                } else {
+                    throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+                }
+            } else {
+                throw createGeneralException(CODE_EXPIRED, HttpStatus.BAD_REQUEST, Error.CODE_EXPIRED);
+            }
+        } else {
+            throw createGeneralException(CODE_IS_NOT_VALID, HttpStatus.BAD_REQUEST, Error.CODE_NOT_VALID);
+        }
+    }
+
+    private User getUserByPrincipal(Principal principal) throws GeneralException {
+        return userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> createGeneralException(USER_WITH_EMAIL + principal.getName() + NOT_FOUND, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+    }
+
+    private boolean availableToChangePassword(User user) {
+        if (user.getCountOfResetPassword() == null) {
+            return true;
+        } else {
+            return user.getCountOfResetPassword() < Long.parseLong(configRepository.findByName(Configs.MAX_COUNT_OF_RESET_PASSWORD.name()).getValue());
+        }
+    }
+
+    private Integer incrementAndGet(User user) {
+        return user.getCountOfResetPassword() == null ? 1 : user.getCountOfResetPassword() + 1;
+    }
+
     private String generateSecretPhrase() {
         return UUID.randomUUID().toString();
     }
@@ -208,6 +285,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return emailService.buildEmail(user.getEmail(), appLocale, EmailTemplates.CONFIRMATION,
                 Map.of("confirmationLink", createConfirmationLink(user),
                         "firstName", user.getFirstName()));
+    }
+
+    private SendEmailCommand createSendResetPasswordEmailCommand(User user, AppLocale appLocale, Integer code) {
+        return emailService.buildEmail(user.getEmail(), appLocale, EmailTemplates.RESET_PASSWORD,
+                Map.of("resetPasswordCode", String.valueOf(code),
+                        "firstName", user.getFirstName()));
+    }
+
+    private Integer generateSixDigitCode() {
+        return RandomUtils.nextInt(100000, 999999);
     }
 
     private String createConfirmationLink(User user) {
@@ -242,7 +329,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private void validateUsername(User newUser) throws GeneralException {
         if (validationService.isValidUsername(newUser.getUsername())) {
-            if(userRepository.findByUsername(newUser.getUsername()).isPresent()) {
+            if (userRepository.findByUsername(newUser.getUsername()).isPresent()) {
                 throw createGeneralException("Username already exists", HttpStatus.BAD_REQUEST, Error.USERNAME_ALREADY_EXISTS);
             }
             newUser.setUsername(newUser.getUsername().toLowerCase());
@@ -253,7 +340,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private void validateEmail(User newUser) throws GeneralException {
         if (validationService.isValidEmail(newUser.getEmail())) {
-            if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+            if (findUserByEmail(newUser.getEmail()) != null) {
                 throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, Error.USER_EMAIL_ALREADY_EXISTS);
             }
             newUser.setEmail(newUser.getEmail().toLowerCase());

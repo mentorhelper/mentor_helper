@@ -1,24 +1,20 @@
 package com.ua.javarush.mentor.services;
 
-import com.ua.javarush.mentor.command.UserCommand;
-import com.ua.javarush.mentor.command.UserMessageCommand;
-import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.persist.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Principal;
+
 
 public interface UserService {
 
     UserDetails loadUserDetailsByUserId(Long id) throws GeneralException;
 
-    UserDetails loadUserByUsername(String username) throws GeneralException;
-
     void matchPassword(User user, String password) throws GeneralException;
-
-    UserDTO findUserById(Long id) throws GeneralException;
 
     User findUserByEmail(String email) throws GeneralException;
 
@@ -37,4 +33,10 @@ public interface UserService {
     void sendConfirmationEmail(String email) throws GeneralException;
 
     void confirmEmail(String token, String email) throws GeneralException;
+
+    void resetPassword(String email) throws GeneralException;
+
+    void changePassword(ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException;
+
+    void confirmResetPassword(ResetPasswordCommand resetPasswordCommand) throws GeneralException;
 }

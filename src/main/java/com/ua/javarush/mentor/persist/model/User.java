@@ -70,6 +70,20 @@ public class User implements Serializable {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<RefreshSessions> refreshSessions = new HashSet<>();
+    @Column(name = "DATE_OF_SENDING_RESET_PASSWORD")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateOfSendingResetPassword;
+    @Column(name = "RESET_PASSWORD_CODE", length = 100)
+    private String resetPasswordCode;
+    @Column(name = "DATE_OF_RESET_PASSWORD")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateOfResetPassword;
+    @Column(name = "COUNT_OF_RESET_PASSWORD")
+    private Integer countOfResetPassword;
+    @Column(name = "LAST_PASSWORD_CHANGE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastPasswordChange;
+
 
     @Override
     public boolean equals(Object o) {

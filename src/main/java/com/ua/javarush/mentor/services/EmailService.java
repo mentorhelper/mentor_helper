@@ -9,6 +9,9 @@ import java.util.Map;
 
 public interface EmailService {
     void sendConfirmationEmail(SendEmailCommand sendEmailCommand) throws GeneralException;
+
+    void sendResetPasswordEmail(SendEmailCommand sendEmailCommand) throws GeneralException;
+
     SendEmailCommand buildEmail(String email, AppLocale appLocale, EmailTemplates emailTemplates, Map<String, String> newParams);
 }
 
