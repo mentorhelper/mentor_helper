@@ -21,4 +21,10 @@ public class ErrorCode {
     public static final String UNABLE_TO_PARSE_JSON = "10";
     public static final String UNABLE_TO_CREATE_JSON = "11";
     public static final String PASSWORD_NOT_VALID = "12";
+    public static final String EMAIL_NOT_VALID = "13";
+    public static final String USERNAME_NOT_VALID = "14";
+    public static final String COUNTRY_NOT_FOUND = "15";
+    public static final String COUNTRY_NOT_SET = "16";
+    public static final String USER_EMAIL_ALREADY_EXISTS = "17";
+    public static final String USERNAME_ALREADY_EXISTS = "18";
 }

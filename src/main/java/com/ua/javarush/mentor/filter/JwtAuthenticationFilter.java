@@ -4,10 +4,12 @@ import com.ua.javarush.mentor.security.JwtTokenProvider;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,20 +18,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.StringUtils.hasText;
-import static org.springframework.util.StringUtils.isEmpty;
 
 
 @Slf4j
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
+    private static final String AUTH = "auth";
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserService userService) {
-        this.tokenProvider = tokenProvider;
-        this.userService = userService;
-    }
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+    @Autowired
+    private UserService userService;
 
     @SneakyThrows
     @Override
@@ -45,20 +49,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         filterChain.doFilter(request, response);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        String bearerToken = request.getHeader(AUTHORIZATION);
+        if (hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(7);
         }
-
-        if (request.getRequestURI().startsWith("/upload") && !isEmpty(request.getParameter("auth"))) {
-            return request.getParameter("auth");
+        if (isNotEmpty(request.getParameter(AUTH))) {
+            return request.getParameter(AUTH);
         }
-
         return null;
     }
 }

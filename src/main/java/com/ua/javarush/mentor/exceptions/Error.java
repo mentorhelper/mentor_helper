@@ -20,6 +20,12 @@ public enum Error {
     UNABLE_TO_PARSE_JSON(ErrorCode.UNABLE_TO_PARSE_JSON, "Unable to parse json"),
     UNABLE_TO_CREATE_JSON(ErrorCode.UNABLE_TO_CREATE_JSON, "Unable to create json"),
     PASSWORD_NOT_VALID(ErrorCode.PASSWORD_NOT_VALID, "Password not valid"),
+    EMAIL_NOT_VALID(ErrorCode.EMAIL_NOT_VALID, "Email not valid"),
+    USERNAME_NOT_VALID(ErrorCode.USERNAME_NOT_VALID, "Username not valid"),
+    COUNTRY_NOT_FOUND(ErrorCode.COUNTRY_NOT_FOUND, "Country not found"),
+    COUNTRY_NOT_SET(ErrorCode.COUNTRY_NOT_SET, "Country not set"),
+    USER_EMAIL_ALREADY_EXISTS(ErrorCode.USER_EMAIL_ALREADY_EXISTS, "User email already exists"),
+    USERNAME_ALREADY_EXISTS(ErrorCode.USERNAME_ALREADY_EXISTS, "Username already exists"),
     APPLICATION_ERROR(ErrorCode.APPLICATION_ERROR, "Application error");
 
     private final String code;

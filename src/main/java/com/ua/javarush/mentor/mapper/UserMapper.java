@@ -19,6 +19,8 @@ public abstract class UserMapper implements Converter {
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "country", source = "country")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "username", source = "username")
     @Mapping(target = "registeredAt", source = "registeredAt", qualifiedByName = "dateToString")
     @Mapping(target = "telegramId", source = "telegramId")
     @Mapping(target = "telegramNickname", source = "telegramNickname")

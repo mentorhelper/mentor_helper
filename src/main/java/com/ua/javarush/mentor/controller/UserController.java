@@ -31,7 +31,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("")
+    @PostMapping("/create")
     @Operation(summary = "Create user",
             description = "Create user with userCommand",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -48,7 +48,7 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "User")
-    public ResponseEntity<UserDTO> createNewRole(@RequestBody UserCommand userCommand) throws GeneralException {
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserCommand userCommand) throws GeneralException {
         return new ResponseEntity<>(userService.createUser(userCommand), HttpStatus.CREATED);
     }
 

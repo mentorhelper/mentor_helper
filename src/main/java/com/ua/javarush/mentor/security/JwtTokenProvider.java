@@ -31,6 +31,7 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         Map<String, Object> tokenData = new HashMap<>();
         tokenData.put("user_id", userPrincipal.getId());
+        tokenData.put("user_name", userPrincipal.getUsername());
         tokenData.put("role", userPrincipal.getRoleName());
 
         return Jwts.builder()

@@ -671,15 +671,15 @@ databaseChangeLog:
               - column:
                   name: username
                   type: varchar(255)
-                  remarks: "Notification provider"
+                  remarks: "username"
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: password
                   type: text
-                  remarks: "Notification data"
+                  remarks: "password"
                   constraints:
-                    nullable: true
+                    nullable: false
         - createTable:
             tableName: refresh_session
             columns:
@@ -734,13 +734,13 @@ databaseChangeLog:
                   type: varchar(255)
                   remarks: "Device type"
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: fingerprint
                   type: varchar(255)
                   remarks: "Fingerprint"
                   constraints:
-                    nullable: true
+                    nullable: false
 
 
 

@@ -15,10 +15,7 @@ import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
-import com.ua.javarush.mentor.services.EmailService;
-import com.ua.javarush.mentor.services.RoleService;
-import com.ua.javarush.mentor.services.TelegramService;
-import com.ua.javarush.mentor.services.UserService;
+import com.ua.javarush.mentor.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,15 +60,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserMapper userMapper;
     private final UserDetailsMapper userDetailsMapper;
     private final RoleService roleService;
+    private final ValidationService validationService;
     private final TelegramService telegramService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.userDetailsMapper = userDetailsMapper;
         this.roleService = roleService;
+        this.validationService = validationService;
         this.telegramService = telegramService;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -109,11 +108,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public UserDetails loadUserDetailsByUserId(Long id) throws GeneralException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+        return userDetailsMapper.mapToUserDetails(user);
+    }
+
+    @Override
     @Transactional(rollbackFor = GeneralException.class)
     public UserDTO createUser(UserCommand userCommand) throws GeneralException {
         User newUser = userMapper.mapToEntity(userCommand);
+        validateUserData(newUser);
         newUser.setSecretPhrase(generateSecretPhrase());
-        newUser.setPassword(bCryptPasswordEncoder.encode(userCommand.getPassword()));
         userRepository.save(newUser);
         log.info(LOG_USER_WAS_CREATED, newUser.getFirstName(), newUser.getLastName());
         sendConfirmationEmail(newUser.getEmail());
@@ -218,16 +224,55 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return calendar.getTime();
     }
 
+    private void validateUserData(User newUser) throws GeneralException {
+        validatePassword(newUser);
+        validateEmail(newUser);
+        validateUsername(newUser);
+        validateCountry(newUser);
+    }
+
+    private void validateCountry(User newUser) throws GeneralException {
+        if (newUser.getCountry() == null) {
+            throw createGeneralException("Country is not set", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_SET);
+        }
+        if (!validationService.isValidCountry(newUser.getCountry())) {
+            throw createGeneralException("Country is not supported. Please choose other country", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_FOUND);
+        }
+    }
+
+    private void validateUsername(User newUser) throws GeneralException {
+        if (validationService.isValidUsername(newUser.getUsername())) {
+            if(userRepository.findByUsername(newUser.getUsername()).isPresent()) {
+                throw createGeneralException("Username already exists", HttpStatus.BAD_REQUEST, Error.USERNAME_ALREADY_EXISTS);
+            }
+            newUser.setUsername(newUser.getUsername().toLowerCase());
+        } else {
+            throw createGeneralException("Invalid username", HttpStatus.BAD_REQUEST, Error.USERNAME_NOT_VALID);
+        }
+    }
+
+    private void validateEmail(User newUser) throws GeneralException {
+        if (validationService.isValidEmail(newUser.getEmail())) {
+            if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+                throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, Error.USER_EMAIL_ALREADY_EXISTS);
+            }
+            newUser.setEmail(newUser.getEmail().toLowerCase());
+        } else {
+            throw createGeneralException("Invalid email", HttpStatus.BAD_REQUEST, Error.EMAIL_NOT_VALID);
+        }
+    }
+
+    private void validatePassword(User newUser) throws GeneralException {
+        if (validationService.isValidPassword(newUser.getPassword())) {
+            newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        } else {
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+        }
+    }
+
     @NotNull
     private User fetchUser(Long id) throws GeneralException {
         return userRepository.findById(id)
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
-    }
-
-    @Override
-    public UserDetails loadUserDetailsByUserId(Long id) throws GeneralException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
-        return userDetailsMapper.mapToUserDetails(user);
     }
 }

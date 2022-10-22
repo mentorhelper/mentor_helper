@@ -63,6 +63,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             log.warn("Registration was not confirmed by the user {}", user);
             throw createGeneralException("User not verified by email", HttpStatus.BAD_REQUEST, Error.APPLICATION_ERROR);
         }
+        log.info("User {} successfully logged in", user.getEmail());
         checkCountSessions(user);
         return generateRefreshSession(user, deviceType);
     }

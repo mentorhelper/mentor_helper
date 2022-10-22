@@ -23,6 +23,10 @@ public class UserDTO {
     private String lastName;
     @Schema(description = "Country")
     private String country;
+    @Schema(description = "Email")
+    private String email;
+    @Schema(description = "Username")
+    private String username;
     @Schema(description = "Registered at")
     private String registeredAt;
     @Schema(description = "Telegram id")
