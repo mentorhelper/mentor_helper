@@ -10,14 +10,12 @@ import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.enums.EmailTemplates;
 import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.mapper.UserDetailsMapper;
 import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
-import com.ua.javarush.mentor.services.EmailService;
-import com.ua.javarush.mentor.services.RoleService;
-import com.ua.javarush.mentor.services.TelegramService;
-import com.ua.javarush.mentor.services.UserService;
+import com.ua.javarush.mentor.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,20 +24,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private static final String USER_CONFIRM_PATH = "/user/email/confirm/";
     private static final String SLASH = "/";
@@ -58,27 +58,71 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserDetailsMapper userDetailsMapper;
     private final RoleService roleService;
+    private final ValidationService validationService;
     private final TelegramService telegramService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleService roleService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.userDetailsMapper = userDetailsMapper;
         this.roleService = roleService;
+        this.validationService = validationService;
         this.telegramService = telegramService;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        UserDetails userDetails = userDetailsMapper.mapToUserDetails(user.get());
+        new AccountStatusUserDetailsChecker().check(userDetails);
+        return userDetails;
+    }
+
+    @Override
+    public void matchPassword(User user, String password) throws GeneralException {
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+        }
+    }
+
+    @Override
+    public UserDTO findUserById(Long id) throws GeneralException {
+        return userMapper.mapToDto(userRepository.findById(id)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND)));
+    }
+
+    @Override
+    public User findUserByEmail(String email) throws GeneralException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+    }
+
+    @Override
+    public UserDetails loadUserDetailsByUserId(Long id) throws GeneralException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+        return userDetailsMapper.mapToUserDetails(user);
+    }
+
+    @Override
     @Transactional(rollbackFor = GeneralException.class)
     public UserDTO createUser(UserCommand userCommand) throws GeneralException {
         User newUser = userMapper.mapToEntity(userCommand);
+        validateUserData(newUser);
         newUser.setSecretPhrase(generateSecretPhrase());
         userRepository.save(newUser);
         log.info(LOG_USER_WAS_CREATED, newUser.getFirstName(), newUser.getLastName());
+        sendConfirmationEmail(newUser.getEmail());
         return userMapper.mapToDto(newUser);
     }
 
@@ -178,6 +222,52 @@ public class UserServiceImpl implements UserService {
         calendar.setTime(date);
         calendar.add(Calendar.MINUTE, timeInMinutes);
         return calendar.getTime();
+    }
+
+    private void validateUserData(User newUser) throws GeneralException {
+        validatePassword(newUser);
+        validateEmail(newUser);
+        validateUsername(newUser);
+        validateCountry(newUser);
+    }
+
+    private void validateCountry(User newUser) throws GeneralException {
+        if (newUser.getCountry() == null) {
+            throw createGeneralException("Country is not set", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_SET);
+        }
+        if (!validationService.isValidCountry(newUser.getCountry())) {
+            throw createGeneralException("Country is not supported. Please choose other country", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_FOUND);
+        }
+    }
+
+    private void validateUsername(User newUser) throws GeneralException {
+        if (validationService.isValidUsername(newUser.getUsername())) {
+            if(userRepository.findByUsername(newUser.getUsername()).isPresent()) {
+                throw createGeneralException("Username already exists", HttpStatus.BAD_REQUEST, Error.USERNAME_ALREADY_EXISTS);
+            }
+            newUser.setUsername(newUser.getUsername().toLowerCase());
+        } else {
+            throw createGeneralException("Invalid username", HttpStatus.BAD_REQUEST, Error.USERNAME_NOT_VALID);
+        }
+    }
+
+    private void validateEmail(User newUser) throws GeneralException {
+        if (validationService.isValidEmail(newUser.getEmail())) {
+            if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+                throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, Error.USER_EMAIL_ALREADY_EXISTS);
+            }
+            newUser.setEmail(newUser.getEmail().toLowerCase());
+        } else {
+            throw createGeneralException("Invalid email", HttpStatus.BAD_REQUEST, Error.EMAIL_NOT_VALID);
+        }
+    }
+
+    private void validatePassword(User newUser) throws GeneralException {
+        if (validationService.isValidPassword(newUser.getPassword())) {
+            newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        } else {
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+        }
     }
 
     @NotNull

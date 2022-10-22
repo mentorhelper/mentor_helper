@@ -6,9 +6,22 @@ import com.ua.javarush.mentor.command.UserPermissionCommand;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.persist.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 public interface UserService {
+
+    UserDetails loadUserDetailsByUserId(Long id) throws GeneralException;
+
+    UserDetails loadUserByUsername(String username) throws GeneralException;
+
+    void matchPassword(User user, String password) throws GeneralException;
+
+    UserDTO findUserById(Long id) throws GeneralException;
+
+    User findUserByEmail(String email) throws GeneralException;
+
     UserDTO createUser(UserCommand userCommand) throws GeneralException;
 
     PageDTO<UserDTO> getAllUsers(int page, int size, String sortBy);
