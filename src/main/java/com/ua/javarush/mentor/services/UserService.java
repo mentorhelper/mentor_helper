@@ -3,11 +3,14 @@ package com.ua.javarush.mentor.services;
 import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.persist.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.Principal;
+
+import javax.servlet.http.HttpServletResponse;
 
 
 public interface UserService {
@@ -39,4 +42,6 @@ public interface UserService {
     void changePassword(ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException;
 
     void confirmResetPassword(ResetPasswordCommand resetPasswordCommand) throws GeneralException;
+
+    void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException;
 }

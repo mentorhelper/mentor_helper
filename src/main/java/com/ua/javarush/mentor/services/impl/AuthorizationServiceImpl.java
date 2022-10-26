@@ -2,16 +2,16 @@ package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.DeviceType;
-import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.exceptions.InvalidRefreshSessionException;
 import com.ua.javarush.mentor.exceptions.SessionExpiredException;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.mapper.UserMapper;
 import com.ua.javarush.mentor.persist.model.RefreshSessions;
 import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.persist.repository.RefreshSessionsRepository;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
-import com.ua.javarush.mentor.security.JwtTokenProvider;
+import com.ua.javarush.mentor.security.jwt.JwtTokenProvider;
 import com.ua.javarush.mentor.services.AuthorizationService;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         userService.matchPassword(user, password);
         if (Boolean.FALSE.equals(user.isEmailVerified())) {
             log.warn("Registration was not confirmed by the user {}", user);
-            throw createGeneralException("User not verified by email", HttpStatus.BAD_REQUEST, Error.APPLICATION_ERROR);
+            throw createGeneralException("User not verified by email", HttpStatus.BAD_REQUEST, UiError.APPLICATION_ERROR);
         }
         log.info("User {} successfully logged in", user.getEmail());
         checkCountSessions(user);
@@ -90,7 +90,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         RefreshSessions refreshSession = refreshSessionsRepository.findByRefreshToken(refreshToken);
         if (isNull(refreshSession)) {
             log.warn("Could not find refresh session by refresh token {}", refreshToken);
-            throw createGeneralException("Could not find refresh session by refresh token " + refreshToken.toString(), HttpStatus.BAD_REQUEST, Error.APPLICATION_ERROR);
+            throw createGeneralException("Could not find refresh session by refresh token " + refreshToken.toString(), HttpStatus.BAD_REQUEST, UiError.APPLICATION_ERROR);
         }
         return refreshSession;
     }

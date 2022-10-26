@@ -2,7 +2,7 @@ package com.ua.javarush.mentor.mapper;
 
 import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
-import com.ua.javarush.mentor.security.UserDetailsImpl;
+import com.ua.javarush.mentor.services.impl.UserDetailsImpl;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.core.GrantedAuthority;

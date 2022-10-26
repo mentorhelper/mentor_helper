@@ -1,7 +1,7 @@
 package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.bot.MentorHelperBot;
-import com.ua.javarush.mentor.exceptions.Error;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.TelegramService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class TelegramServiceImpl implements TelegramService {
             mentorHelperBot.execute(buildMessage(userId, message));
         } catch (Exception e) {
             log.error("Error while sending message to user with id {}", userId, e);
-            throw createGeneralException("Cannot send message to user with id " + userId, BAD_REQUEST, Error.TELEGRAM_SEND_MESSAGE_ERROR, e);
+            throw createGeneralException("Cannot send message to user with id " + userId, BAD_REQUEST, UiError.TELEGRAM_SEND_MESSAGE_ERROR, e);
         }
 
     }

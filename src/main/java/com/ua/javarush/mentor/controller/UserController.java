@@ -4,6 +4,7 @@ import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
+import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 import java.security.Principal;
 
@@ -79,7 +82,6 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get user by id",
             description = "Get user by id",
             parameters = {
@@ -247,6 +249,23 @@ public class UserController {
             tags = "User")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException {
         userService.changePassword(changePasswordCommand, principal);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/export/pdf")
+    @Operation(
+            summary = "Generate pdf",
+            description = "Generate pdf about all users. Available languages: EN, RU",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))}
+    )
+    public ResponseEntity<Void> exportToPDF(HttpServletResponse response,
+                                            AppLocale appLocale) throws GeneralException {
+        userService.exportToPDF(response, appLocale);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

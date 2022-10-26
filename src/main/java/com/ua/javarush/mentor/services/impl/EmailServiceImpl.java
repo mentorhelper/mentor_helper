@@ -4,8 +4,8 @@ import com.ua.javarush.mentor.command.SendEmailCommand;
 import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.enums.EmailTemplates;
 import com.ua.javarush.mentor.enums.NotificationProvider;
-import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.services.EmailService;
 import com.ua.javarush.mentor.services.NotificationService;
 import freemarker.template.Configuration;
@@ -66,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
             notificationService.saveNotification(notificationService.createNotification(sendEmailCommand, NotificationProvider.EMAIL));
         } catch (Exception e) {
             log.error("Error send email to " + sendEmailCommand.getEmail() + ". " + e.getLocalizedMessage());
-            throw createGeneralException("Cannot send email", HttpStatus.NOT_FOUND, Error.EMAIL_SEND_ERROR);
+            throw createGeneralException("Cannot send email", HttpStatus.NOT_FOUND, UiError.EMAIL_SEND_ERROR);
         }
     }
 
@@ -85,7 +85,7 @@ public class EmailServiceImpl implements EmailService {
             notificationService.saveNotification(notificationService.createNotification(sendEmailCommand, NotificationProvider.EMAIL));
         } catch (Exception e) {
             log.error("Error send email to " + sendEmailCommand.getEmail() + ". " + e.getLocalizedMessage());
-            throw createGeneralException("Cannot send email", HttpStatus.NOT_FOUND, Error.EMAIL_SEND_ERROR);
+            throw createGeneralException("Cannot send email", HttpStatus.NOT_FOUND, UiError.EMAIL_SEND_ERROR);
         }
     }
 

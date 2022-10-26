@@ -10,31 +10,31 @@ public class GeneralExceptionUtils {
     private GeneralExceptionUtils() {
     }
 
-    public static GeneralException createGeneralException(String message, HttpStatus status, List<Error> errors, Exception exception) {
-        List<Error> errorList = new ArrayList<>(errors);
+    public static GeneralException createGeneralException(String message, HttpStatus status, List<UiError> uiErrors, Exception exception) {
+        List<UiError> uiErrorList = new ArrayList<>(uiErrors);
         if (exception instanceof GeneralException) {
-            errorList.addAll(((GeneralException) exception).getErrors());
+            uiErrorList.addAll(((GeneralException) exception).getUiErrors());
         }
-        return new GeneralException(message, status, errorList);
+        return new GeneralException(message, status, uiErrorList);
     }
 
-    public static GeneralException createGeneralException(String message, HttpStatus status, List<Error> errors) {
-        return new GeneralException(message, status, errors);
+    public static GeneralException createGeneralException(String message, HttpStatus status, List<UiError> uiErrors) {
+        return new GeneralException(message, status, uiErrors);
     }
 
-    public static GeneralException createGeneralException(String message, HttpStatus status, Error error, Exception exception) {
-        List<Error> errors = new ArrayList<>(List.of(error));
+    public static GeneralException createGeneralException(String message, HttpStatus status, UiError uiError, Exception exception) {
+        List<UiError> uiErrors = new ArrayList<>(List.of(uiError));
         if (exception instanceof GeneralException) {
-            errors.addAll(((GeneralException) exception).getErrors());
+            uiErrors.addAll(((GeneralException) exception).getUiErrors());
         }
-        return new GeneralException(message, status, errors);
+        return new GeneralException(message, status, uiErrors);
     }
 
-    public static GeneralException createGeneralException(String message, HttpStatus status, Error error) {
-        return new GeneralException(message, status, buildErrorList(error));
+    public static GeneralException createGeneralException(String message, HttpStatus status, UiError uiError) {
+        return new GeneralException(message, status, buildErrorList(uiError));
     }
 
-    public static List<Error> buildErrorList(Error error) {
-        return List.of(error);
+    public static List<UiError> buildErrorList(UiError uiError) {
+        return List.of(uiError);
     }
 }

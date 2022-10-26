@@ -3,7 +3,6 @@ package com.ua.javarush.mentor.controller;
 import com.ua.javarush.mentor.command.LoginCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.DeviceType;
-import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.AuthorizationService;
 import io.swagger.v3.oas.annotations.Operation;

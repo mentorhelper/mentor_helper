@@ -12,13 +12,13 @@ public class GeneralException extends Exception {
 
     private final String message;
     private final HttpStatus httpStatus;
-    private final List<Error> errors;
+    private final List<UiError> uiErrors;
 
-    public GeneralException(String message, HttpStatus status, List<Error> errors) {
+    public GeneralException(String message, HttpStatus status, List<UiError> uiErrors) {
         super(message);
         this.message = message;
         this.httpStatus = status;
-        this.errors = errors;
+        this.uiErrors = uiErrors;
     }
 }
 

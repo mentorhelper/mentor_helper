@@ -4,9 +4,9 @@ import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.AppLocale;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.enums.Configs;
 import com.ua.javarush.mentor.enums.EmailTemplates;
-import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.UserDetailsMapper;
 import com.ua.javarush.mentor.mapper.UserMapper;
@@ -14,6 +14,10 @@ import com.ua.javarush.mentor.persist.model.Role;
 import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.persist.repository.ConfigRepository;
 import com.ua.javarush.mentor.persist.repository.UserRepository;
+import com.ua.javarush.mentor.reports.UserPDFExporter;
+import com.ua.javarush.mentor.services.RoleService;
+import com.ua.javarush.mentor.services.TelegramService;
+import com.ua.javarush.mentor.services.UserService;
 import com.ua.javarush.mentor.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -36,6 +40,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.stream.Collectors;
+
+import static com.ua.javarush.mentor.enums.PDFSubtype.USERS;
 import static com.ua.javarush.mentor.exceptions.GeneralExceptionUtils.createGeneralException;
 
 @Slf4j
@@ -55,6 +66,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public static final String LOG_USER_WAS_CREATED = "User '{} {}' was created";
     public static final String LOG_REMOVE_USER_ID_NAME = "Remove user: id={}, name={} {}";
     public static final String NOT_FOUND_USER_ERROR = "Didn't found user";
+    private static final String PDF_FORMAT = ".pdf";
+    private static final String DATETIME_PATTERN_FOR_REPORT = "yyyy-MM-dd_HH:mm:ss";
+    private static final String PDF_REPORT_SORT_TYPE_DEFAULT = "firstName";
+    private static final String CONTENT_TYPE_PDF = "application/pdf";
 
     @Value("${app.host}")
     private String host;
@@ -66,10 +81,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleService roleService;
     private final ValidationService validationService;
     private final TelegramService telegramService;
+    private final UserPDFExporter userPDFExporter;
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, ConfigRepository configRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, ConfigRepository configRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, UserPDFExporter userPDFExporter, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.configRepository = configRepository;
         this.userMapper = userMapper;
@@ -77,6 +93,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.roleService = roleService;
         this.validationService = validationService;
         this.telegramService = telegramService;
+        this.userPDFExporter = userPDFExporter;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -96,20 +113,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void matchPassword(User user, String password) throws GeneralException {
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, UiError.PASSWORD_NOT_VALID);
         }
     }
 
     @Override
     public User findUserByEmail(String email) throws GeneralException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, UiError.USER_NOT_FOUND));
     }
 
     @Override
     public UserDetails loadUserDetailsByUserId(Long id) throws GeneralException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, UiError.USER_NOT_FOUND));
         return userDetailsMapper.mapToUserDetails(user);
     }
 
@@ -165,8 +182,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.getTelegramId() != null) {
             telegramService.sendMessage(user.getTelegramId(), userMessageCommand.getMessage());
         } else {
-            throw createGeneralException("Telegram id not set for user with id " + user.getId(), HttpStatus.BAD_REQUEST, Error.TELEGRAM_ID_NOT_FOUND);
+            throw createGeneralException("Telegram id not set for user with id " + user.getId(), HttpStatus.BAD_REQUEST, UiError.TELEGRAM_ID_NOT_FOUND);
         }
+    }
+
+    @Override
+    public void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException {
+        response.setContentType(CONTENT_TYPE_PDF);
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=" + generateFileName(USERS);
+        response.setHeader(headerKey, headerValue);
+
+        userPDFExporter.export(response,
+                userRepository.findAll(Sort.by(PDF_REPORT_SORT_TYPE_DEFAULT).ascending())
+                        .stream()
+                        .map(userMapper::mapToDto)
+                        .collect(Collectors.toList()),
+                appLocale);
+    }
+
+    private String generateFileName(String filePrefix) {
+        DateFormat dateFormatter = new SimpleDateFormat(DATETIME_PATTERN_FOR_REPORT);
+        String currentDateTime = dateFormatter.format(new Date());
+        return filePrefix + currentDateTime + PDF_FORMAT;
     }
 
     @Override
@@ -191,10 +230,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 userRepository.save(user);
                 log.info("User {} {} confirmed email", user.getFirstName(), user.getLastName());
             } else {
-                throw createGeneralException(TOKEN_EXPIRED, HttpStatus.BAD_REQUEST, Error.TOKEN_EXPIRED);
+                throw createGeneralException(TOKEN_EXPIRED, HttpStatus.BAD_REQUEST, UiError.TOKEN_EXPIRED);
             }
         } else {
-            throw createGeneralException(TOKEN_IS_NOT_VALID, HttpStatus.BAD_REQUEST, Error.TOKEN_NOT_VALID);
+            throw createGeneralException(TOKEN_IS_NOT_VALID, HttpStatus.BAD_REQUEST, UiError.TOKEN_NOT_VALID);
         }
     }
 
@@ -211,7 +250,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             emailService.sendResetPasswordEmail(createSendResetPasswordEmailCommand(user, AppLocale.EN, code));
             log.info("Reset password email was sent to user: {} {}", user.getFirstName(), user.getLastName());
         } else {
-            throw createGeneralException("Max count of reset password reached", HttpStatus.BAD_REQUEST, Error.MAX_COUNT_OF_RESET_PASSWORD_REACHED);
+            throw createGeneralException("Max count of reset password reached", HttpStatus.BAD_REQUEST, UiError.MAX_COUNT_OF_RESET_PASSWORD_REACHED);
         }
     }
 
@@ -226,10 +265,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 userRepository.save(user);
                 log.info("Password was changed for user: {} {}", user.getFirstName(), user.getLastName());
             } else {
-                throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+                throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, UiError.PASSWORD_NOT_VALID);
             }
         } else {
-            throw createGeneralException("Old password is not valid", HttpStatus.BAD_REQUEST, Error.OLD_PASSWORD_NOT_VALID);
+            throw createGeneralException("Old password is not valid", HttpStatus.BAD_REQUEST, UiError.OLD_PASSWORD_NOT_VALID);
         }
     }
 
@@ -250,19 +289,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     userRepository.save(user);
                     log.info("Password was reset for user: {} {}", user.getFirstName(), user.getLastName());
                 } else {
-                    throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+                    throw createGeneralException("New password is not valid", HttpStatus.BAD_REQUEST, UiError.PASSWORD_NOT_VALID);
                 }
             } else {
-                throw createGeneralException(CODE_EXPIRED, HttpStatus.BAD_REQUEST, Error.CODE_EXPIRED);
+                throw createGeneralException(CODE_EXPIRED, HttpStatus.BAD_REQUEST, UiError.CODE_EXPIRED);
             }
         } else {
-            throw createGeneralException(CODE_IS_NOT_VALID, HttpStatus.BAD_REQUEST, Error.CODE_NOT_VALID);
+            throw createGeneralException(CODE_IS_NOT_VALID, HttpStatus.BAD_REQUEST, UiError.CODE_NOT_VALID);
         }
     }
 
     private User getUserByPrincipal(Principal principal) throws GeneralException {
         return userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> createGeneralException(USER_WITH_EMAIL + principal.getName() + NOT_FOUND, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(USER_WITH_EMAIL + principal.getName() + NOT_FOUND, HttpStatus.NOT_FOUND, UiError.USER_NOT_FOUND));
     }
 
     private boolean availableToChangePassword(User user) {
@@ -320,32 +359,32 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private void validateCountry(User newUser) throws GeneralException {
         if (newUser.getCountry() == null) {
-            throw createGeneralException("Country is not set", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_SET);
+            throw createGeneralException("Country is not set", HttpStatus.BAD_REQUEST, UiError.COUNTRY_NOT_SET);
         }
         if (!validationService.isValidCountry(newUser.getCountry())) {
-            throw createGeneralException("Country is not supported. Please choose other country", HttpStatus.BAD_REQUEST, Error.COUNTRY_NOT_FOUND);
+            throw createGeneralException("Country is not supported. Please choose other country", HttpStatus.BAD_REQUEST, UiError.COUNTRY_NOT_FOUND);
         }
     }
 
     private void validateUsername(User newUser) throws GeneralException {
         if (validationService.isValidUsername(newUser.getUsername())) {
             if (userRepository.findByUsername(newUser.getUsername()).isPresent()) {
-                throw createGeneralException("Username already exists", HttpStatus.BAD_REQUEST, Error.USERNAME_ALREADY_EXISTS);
+                throw createGeneralException("Username already exists", HttpStatus.BAD_REQUEST, UiError.USERNAME_ALREADY_EXISTS);
             }
             newUser.setUsername(newUser.getUsername().toLowerCase());
         } else {
-            throw createGeneralException("Invalid username", HttpStatus.BAD_REQUEST, Error.USERNAME_NOT_VALID);
+            throw createGeneralException("Invalid username", HttpStatus.BAD_REQUEST, UiError.USERNAME_NOT_VALID);
         }
     }
 
     private void validateEmail(User newUser) throws GeneralException {
         if (validationService.isValidEmail(newUser.getEmail())) {
             if (findUserByEmail(newUser.getEmail()) != null) {
-                throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, Error.USER_EMAIL_ALREADY_EXISTS);
+                throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, UiError.USER_EMAIL_ALREADY_EXISTS);
             }
             newUser.setEmail(newUser.getEmail().toLowerCase());
         } else {
-            throw createGeneralException("Invalid email", HttpStatus.BAD_REQUEST, Error.EMAIL_NOT_VALID);
+            throw createGeneralException("Invalid email", HttpStatus.BAD_REQUEST, UiError.EMAIL_NOT_VALID);
         }
     }
 
@@ -353,13 +392,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (validationService.isValidPassword(newUser.getPassword())) {
             newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         } else {
-            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, Error.PASSWORD_NOT_VALID);
+            throw createGeneralException("Invalid password", HttpStatus.BAD_REQUEST, UiError.PASSWORD_NOT_VALID);
         }
     }
 
     @NotNull
     private User fetchUser(Long id) throws GeneralException {
         return userRepository.findById(id)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, Error.USER_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_USER_ERROR, HttpStatus.NOT_FOUND, UiError.USER_NOT_FOUND));
     }
 }

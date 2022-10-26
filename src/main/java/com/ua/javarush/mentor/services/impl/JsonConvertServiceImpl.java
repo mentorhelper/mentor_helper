@@ -2,8 +2,8 @@ package com.ua.javarush.mentor.services.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ua.javarush.mentor.exceptions.Error;
 import com.ua.javarush.mentor.exceptions.GeneralException;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.services.JsonConvertService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class JsonConvertServiceImpl implements JsonConvertService {
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("Error while converting json to object", e);
-            throw createGeneralException("Unable to parse json", HttpStatus.BAD_REQUEST, Error.UNABLE_TO_PARSE_JSON);
+            throw createGeneralException("Unable to parse json", HttpStatus.BAD_REQUEST, UiError.UNABLE_TO_PARSE_JSON);
         }
     }
 
@@ -42,7 +42,7 @@ public class JsonConvertServiceImpl implements JsonConvertService {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
             log.error("Error while converting object to json", e);
-            throw createGeneralException("Unable to create json", HttpStatus.BAD_REQUEST, Error.UNABLE_TO_CREATE_JSON);
+            throw createGeneralException("Unable to create json", HttpStatus.BAD_REQUEST, UiError.UNABLE_TO_CREATE_JSON);
         }
     }
 
@@ -54,7 +54,7 @@ public class JsonConvertServiceImpl implements JsonConvertService {
             });
         } catch (Exception e) {
             log.error("Error while converting json to list object", e);
-            throw createGeneralException("Unable to create json", HttpStatus.BAD_REQUEST, Error.UNABLE_TO_PARSE_JSON);
+            throw createGeneralException("Unable to create json", HttpStatus.BAD_REQUEST, UiError.UNABLE_TO_PARSE_JSON);
         }
     }
 }

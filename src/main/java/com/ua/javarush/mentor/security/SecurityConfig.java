@@ -1,6 +1,7 @@
 package com.ua.javarush.mentor.security;
 
 import com.ua.javarush.mentor.filter.JwtAuthenticationFilter;
+import com.ua.javarush.mentor.security.jwt.JwtAuthenticationEntryPoint;
 import com.ua.javarush.mentor.services.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

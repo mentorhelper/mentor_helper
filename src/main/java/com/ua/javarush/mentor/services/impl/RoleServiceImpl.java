@@ -5,7 +5,7 @@ import com.ua.javarush.mentor.command.RoleToPermissionCommand;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.RoleDTO;
 import com.ua.javarush.mentor.dto.RoleToPermissionDTO;
-import com.ua.javarush.mentor.exceptions.Error;
+import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.mapper.RoleMapper;
 import com.ua.javarush.mentor.mapper.RoleToPermissionMapper;
@@ -121,7 +121,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role fetchRole(Long roleId) throws GeneralException {
         return roleRepository.findById(roleId)
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_ROLE_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_ROLE_ERROR, HttpStatus.NOT_FOUND, UiError.ROLE_NOT_FOUND));
     }
 
     @NotNull
@@ -129,7 +129,7 @@ public class RoleServiceImpl implements RoleService {
         return fetchRole(roleId).getPermissions().stream()
                 .filter(permission -> permission.getPermission().equals(roleToPermissionCommand.getPermission()))
                 .findAny()
-                .orElseThrow(() -> createGeneralException(NOT_FOUND_PERMISSION_ERROR, HttpStatus.NOT_FOUND, Error.ROLE_PERMISSION_NOT_FOUND));
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_PERMISSION_ERROR, HttpStatus.NOT_FOUND, UiError.ROLE_PERMISSION_NOT_FOUND));
     }
 
     private boolean isExistPermissionByRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {

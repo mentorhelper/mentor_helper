@@ -1,7 +1,7 @@
 package com.ua.javarush.mentor.mapper;
 
 import com.ua.javarush.mentor.dto.ErrorDTO;
-import com.ua.javarush.mentor.exceptions.Error;
+import com.ua.javarush.mentor.exceptions.UiError;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,9 +12,9 @@ public interface ErrorMapper {
 
     @Mapping(target = "code", source = "code")
     @Mapping(target = "message", source = "message")
-    ErrorDTO mapToDto(Error error);
+    ErrorDTO mapToDto(UiError uiError);
 
     @Mapping(target = "code", source = "code")
     @Mapping(target = "message", source = "message")
-    List<ErrorDTO> mapToDto(List<Error> errors);
+    List<ErrorDTO> mapToDto(List<UiError> uiErrors);
 }
