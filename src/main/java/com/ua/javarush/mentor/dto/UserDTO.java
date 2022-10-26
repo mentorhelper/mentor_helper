@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 
 @Data
 @Builder
@@ -21,6 +23,10 @@ public class UserDTO {
     private String lastName;
     @Schema(description = "Country")
     private String country;
+    @Schema(description = "Email")
+    private String email;
+    @Schema(description = "Username")
+    private String username;
     @Schema(description = "Registered at")
     private String registeredAt;
     @Schema(description = "Telegram id")
@@ -31,8 +37,10 @@ public class UserDTO {
     private Integer salaryPerHour;
     @Schema(description = "Salary currency")
     private String salaryCurrency;
-    @Schema(description = "Secret phrase")
-    private String secretPhrase;
     @Schema(description = "Role name")
     private String roleName;
+    @Schema(description = "Access token")
+    private String accessToken;
+    @Schema(description = "Session expired date")
+    private Instant sessionExpiredDate;
 }

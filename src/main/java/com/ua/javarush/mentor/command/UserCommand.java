@@ -18,8 +18,13 @@ public class UserCommand {
     private Integer salaryPerHour;
     @Schema(description = "Salary currency")
     private String salaryCurrency;
-    @Schema(description = "Secret phrase")
-    private String secretPhrase;
     @Schema(description = "Role id")
     private Long roleId;
+    @Schema(description = "Email")
+    private String email;
+    @Schema(description = "Password")
+    private String password;
+    @Schema(description = "Username")
+    private String username;
+
 }

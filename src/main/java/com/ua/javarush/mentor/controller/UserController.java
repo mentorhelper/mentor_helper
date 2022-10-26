@@ -1,8 +1,6 @@
 package com.ua.javarush.mentor.controller;
 
-import com.ua.javarush.mentor.command.UserCommand;
-import com.ua.javarush.mentor.command.UserMessageCommand;
-import com.ua.javarush.mentor.command.UserPermissionCommand;
+import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
@@ -15,12 +13,15 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+
+import java.security.Principal;
 
 
 @RestController
@@ -33,7 +34,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("")
+    @PostMapping("/create")
     @Operation(summary = "Create user",
             description = "Create user with userCommand",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -50,11 +51,12 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "User")
-    public ResponseEntity<UserDTO> createNewRole(@RequestBody UserCommand userCommand) throws GeneralException {
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserCommand userCommand) throws GeneralException {
         return new ResponseEntity<>(userService.createUser(userCommand), HttpStatus.CREATED);
     }
 
     @GetMapping("")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get all users",
             description = "Get all users",
             parameters = {
@@ -100,6 +102,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete user by id",
             description = "Delete user by id",
             parameters = {
@@ -121,6 +124,7 @@ public class UserController {
     }
 
     @PostMapping("/permission")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Add permission to user",
             description = "Add permission to user",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -140,6 +144,7 @@ public class UserController {
     }
 
     @PostMapping("/message")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Send message to user",
             description = "Send message to user",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -155,6 +160,95 @@ public class UserController {
             tags = "User")
     public ResponseEntity<Void> sendMessage(@RequestBody UserMessageCommand userMessageCommand) throws GeneralException {
         userService.sendMessage(userMessageCommand);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @GetMapping("/{email}/confirmation")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Send confirmation email",
+            description = "Send confirmation email",
+            parameters = {
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> sendConfirmationEmail(@PathVariable("email") String email) throws GeneralException {
+        userService.sendConfirmationEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/email/confirm/{token}/{email}")
+    @Operation(summary = "Confirm email",
+            description = "Confirm email",
+            parameters = {
+                    @Parameter(name = "token", description = "Token", required = true),
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> confirmEmail(@PathVariable("token") String token,
+                                             @PathVariable("email") String email) throws GeneralException {
+        userService.confirmEmail(token, email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/password/reset/{email}")
+    @Operation(summary = "Reset password, ask email code",
+            description = "Reset password",
+            parameters = {
+                    @Parameter(name = "email", description = "User email", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> resetPassword(@PathVariable("email") String email) throws GeneralException {
+        userService.resetPassword(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/password/reset/confirm")
+    @Operation(summary = "Reset password with code",
+            description = "Reset password with code",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> resetPasswordWithCode(@RequestBody ResetPasswordCommand resetPasswordCommand) throws GeneralException {
+        userService.confirmResetPassword(resetPasswordCommand);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/password/change")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Change password",
+            description = "Change password",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "400", description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            ))},
+            tags = "User")
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordCommand changePasswordCommand, Principal principal) throws GeneralException {
+        userService.changePassword(changePasswordCommand, principal);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

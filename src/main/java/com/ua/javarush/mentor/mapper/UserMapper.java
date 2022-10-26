@@ -19,23 +19,25 @@ public abstract class UserMapper implements Converter {
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "country", source = "country")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "username", source = "username")
     @Mapping(target = "registeredAt", source = "registeredAt", qualifiedByName = "dateToString")
     @Mapping(target = "telegramId", source = "telegramId")
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
-    @Mapping(target = "secretPhrase", source = "secretPhrase")
     @Mapping(target = "roleName", expression = "java(user.getRoleId().getName())")
     public abstract UserDTO mapToDto(User user);
 
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "country", source = "country")
+    @Mapping(target = "username", source = "username")
+    @Mapping(target = "password", source = "password")
     @Mapping(target = "registeredAt", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "telegramNickname", source = "telegramNickname")
     @Mapping(target = "salaryPerHour", source = "salaryPerHour")
     @Mapping(target = "salaryCurrency", source = "salaryCurrency")
-    @Mapping(target = "secretPhrase", source = "secretPhrase")
     @Mapping(target = "roleId", expression = "java(roleService.fetchRole(userCommand.getRoleId()))")
     public abstract User mapToEntity(UserCommand userCommand) throws GeneralException;
 }

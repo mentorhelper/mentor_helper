@@ -20,7 +20,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${app.web.cors.allow.max.age}")
     private Long maxAge;
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
