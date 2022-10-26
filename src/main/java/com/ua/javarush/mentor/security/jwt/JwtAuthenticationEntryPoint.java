@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.security;
+package com.ua.javarush.mentor.security.jwt;
 
 
 import lombok.extern.slf4j.Slf4j;

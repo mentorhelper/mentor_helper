@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.security;
+package com.ua.javarush.mentor.security.jwt;
 
 
 import com.ua.javarush.mentor.dto.UserDTO;

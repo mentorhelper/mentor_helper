@@ -1,6 +1,6 @@
 package com.ua.javarush.mentor.filter;
 
-import com.ua.javarush.mentor.security.JwtTokenProvider;
+import com.ua.javarush.mentor.security.jwt.JwtTokenProvider;
 import com.ua.javarush.mentor.services.UserService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
