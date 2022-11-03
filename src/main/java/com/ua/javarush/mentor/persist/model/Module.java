@@ -3,10 +3,7 @@ package com.ua.javarush.mentor.persist.model;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -15,16 +12,19 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@SequenceGenerator(name = "MODULE_SEQ_GENERATOR", sequenceName = "MODULE_SEQ", allocationSize = 1)
 public class Module implements Serializable {
     @Id
-    @Column(name = "ID", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "MODULE_SEQ_GENERATOR")
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Column(name = "MODULE_NUMBER", nullable = false)
     private int moduleNumber;
     @Column(name = "LECTURE_COUNT", nullable = false)
     private int lectureCount;
-    @Column(name = "NAME", length = 200, nullable = false)
+    @Column(name = "NAME", unique = true ,length = 200, nullable = false)
     private String name;
     @Column(name = "DESCRIPTION", length = 2000, nullable = false)
     private String description;

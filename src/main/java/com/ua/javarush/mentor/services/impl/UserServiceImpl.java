@@ -170,6 +170,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public void sendConfirmationEmail(String email) throws GeneralException {
         User user = findUserByEmail(email);
         emailService.sendConfirmationEmail(createSendEmailCommand(user, AppLocale.EN));
@@ -340,7 +341,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private void validateEmail(User newUser) throws GeneralException {
         if (validationService.isValidEmail(newUser.getEmail())) {
-            if (findUserByEmail(newUser.getEmail()) != null) {
+            if (userRepository.findByEmail(newUser.getEmail()).isPresent()){
                 throw createGeneralException("User with email " + newUser.getEmail() + " already exists", HttpStatus.BAD_REQUEST, Error.USER_EMAIL_ALREADY_EXISTS);
             }
             newUser.setEmail(newUser.getEmail().toLowerCase());

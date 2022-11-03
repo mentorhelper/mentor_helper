@@ -11,6 +11,7 @@ public enum Error {
     ROLE_ALREADY_EXISTS(ErrorCode.ROLE_ALREADY_EXISTS, "Role already exists"),
     USER_NOT_FOUND(ErrorCode.USER_NOT_FOUND, "Didn't found user"),
     ROLE_NOT_FOUND(ErrorCode.ROLE_NOT_FOUND, "Didn't found role"),
+    MODULE_NOT_FOUND(ErrorCode.MODEL_NOT_FOUND, "Module not found"),
     ROLE_PERMISSION_NOT_FOUND(ErrorCode.ROLE_PERMISSION_NOT_FOUND, "Didn't found role permission"),
     TELEGRAM_SEND_MESSAGE_ERROR(ErrorCode.TELEGRAM_SEND_MESSAGE_ERROR, "Telegram send message error"),
     TELEGRAM_ID_NOT_FOUND(ErrorCode.TELEGRAM_ID_NOT_FOUND, "Telegram id not found"),

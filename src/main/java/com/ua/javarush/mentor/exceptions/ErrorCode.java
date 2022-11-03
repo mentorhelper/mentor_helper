@@ -31,4 +31,6 @@ public class ErrorCode {
     public static final String OLD_PASSWORD_NOT_VALID = "20";
     public static final String CODE_NOT_VALID = "21";
     public static final String CODE_EXPIRED = "22";
+    public static final String MODEL_NOT_FOUND = "23";
+
 }
