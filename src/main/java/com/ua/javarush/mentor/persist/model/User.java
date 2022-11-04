@@ -84,6 +84,15 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastPasswordChange;
 
+ //  @Column(name = "active")
+    private int active;
+
+  //  @ManyToMany(cascade=CascadeType.ALL)
+  //  @JoinTable(name="user_role", joinColumns=@JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="role_id"))
+  //    private Set<Role> roles;
+
+
+
 
     @Override
     public boolean equals(Object o) {

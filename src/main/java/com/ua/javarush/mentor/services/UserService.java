@@ -44,4 +44,6 @@ public interface UserService {
     void confirmResetPassword(ResetPasswordCommand resetPasswordCommand) throws GeneralException;
 
     void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException;
+
+    void saveUser(User user) throws GeneralException;
 }

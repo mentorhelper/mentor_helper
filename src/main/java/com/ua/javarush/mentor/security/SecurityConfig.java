@@ -73,6 +73,20 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+              /*
+                .antMatchers("/signup").permitAll()
+                .antMatchers("/home/**").hasAuthority("ADMIN").anyRequest()
+                .authenticated().and().csrf().disable()
+                .formLogin().loginPage("/login").failureUrl("/login?error=true")
+                .defaultSuccessUrl("/home/home")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .and().logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/")
+                .and().rememberMe()
+                .and().exceptionHandling().accessDeniedPage("/access_denied");
+               */
 
         return http.build();
     }
