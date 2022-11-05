@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.controller;
+package com.ua.javarush.mentor.controller.rest;
 
 import com.ua.javarush.mentor.command.RoleCommand;
 import com.ua.javarush.mentor.command.RoleToPermissionCommand;
@@ -21,14 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("api/role")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Role", description = "Role API")
-public class RoleController {
+public class RoleRestController {
 
     private final RoleService roleService;
 
-    public RoleController(RoleService roleService) {
+    public RoleRestController(RoleService roleService) {
         this.roleService = roleService;
     }
 

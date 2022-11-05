@@ -598,7 +598,7 @@ databaseChangeLog:
                   remarks: "User email"
                   constraints:
                     unique: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: email_verified
                   type: boolean
@@ -880,6 +880,39 @@ databaseChangeLog:
                   remarks: "Last password change"
                   constraints:
                     nullable: true
+  - changeSet:
+      id: 23
+      author: antonKupreychik
+      changes:
+        - dropNotNullConstraint:
+            tableName: user
+            columnName: telegram_nickname
+            columnDataType: varchar(255)
+        - dropNotNullConstraint:
+            tableName: user
+            columnName: salary_currency
+            columnDataType: varchar(20)
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  value: 4
+              - column:
+                  name: name
+                  value: NO_ROLE
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: enabled
+                  type: boolean
+                  remarks: "Is enabled"
+              - column:
+                  name: locked
+                  type: boolean
+                  remarks: "Is locked"
+
 
 
 

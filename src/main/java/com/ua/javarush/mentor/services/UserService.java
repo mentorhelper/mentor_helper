@@ -21,6 +21,8 @@ public interface UserService {
 
     User findUserByEmail(String email) throws GeneralException;
 
+    User findUserByUsername(String username) throws GeneralException;
+
     UserDTO createUser(UserCommand userCommand) throws GeneralException;
 
     PageDTO<UserDTO> getAllUsers(int page, int size, String sortBy);
@@ -45,5 +47,5 @@ public interface UserService {
 
     void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException;
 
-    void saveUser(User user) throws GeneralException;
+    boolean isEmailExists(String email);
 }

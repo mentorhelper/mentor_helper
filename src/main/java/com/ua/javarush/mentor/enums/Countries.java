@@ -3,6 +3,10 @@ package com.ua.javarush.mentor.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @Getter
 public enum Countries {
@@ -75,5 +79,11 @@ public enum Countries {
             }
         }
         return false;
+    }
+
+    public static List<String> getAllCountries() {
+        return Arrays.stream(Countries.values())
+                .map(Countries::getCountry)
+                .collect(Collectors.toList());
     }
 }

@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.controller;
+package com.ua.javarush.mentor.controller.handler;
 
 import com.ua.javarush.mentor.dto.ErrorDTO;
 import com.ua.javarush.mentor.exceptions.UiError;

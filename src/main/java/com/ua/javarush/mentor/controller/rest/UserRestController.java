@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.controller;
+package com.ua.javarush.mentor.controller.rest;
 
 import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
@@ -6,7 +6,6 @@ import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.AppLocale;
 import com.ua.javarush.mentor.exceptions.GeneralException;
-import com.ua.javarush.mentor.persist.model.User;
 import com.ua.javarush.mentor.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,29 +15,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import java.security.Principal;
 
-import static com.ua.javarush.mentor.exceptions.UiErrorCode.USER_EMAIL_ALREADY_EXISTS;
-
-
 @RestController
-@RequestMapping("/user")
+@RequestMapping("api/user")
 @Tag(name = "User", description = "Role API")
-public class UserController {
+public class UserRestController {
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    @Autowired
+    public UserRestController(UserService userService) {
         this.userService = userService;
     }
 
@@ -205,10 +199,10 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "User")
-    public ResponseEntity<Void> confirmEmail(@PathVariable("token") String token,
-                                             @PathVariable("email") String email) throws GeneralException {
+    public ModelAndView confirmEmail(@PathVariable("token") String token,
+                                     @PathVariable("email") String email) throws GeneralException {
         userService.confirmEmail(token, email);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ModelAndView("redirect:/login");
     }
 
     @GetMapping("/password/reset/{email}")
@@ -277,59 +271,4 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value= {"/", "/login"}, method=RequestMethod.GET)
-    public ModelAndView login() {
-        ModelAndView model = new ModelAndView();
-
-        model.setViewName("user/login");
-        return model;
-    }
-
-    @RequestMapping(value= {"/signup"}, method=RequestMethod.GET)
-    public ModelAndView signup() {
-        ModelAndView model = new ModelAndView();
-        User user = new User();
-        model.addObject("user", user);
-        model.setViewName("user/signup");
-
-        return model;
-    }
-
-    @RequestMapping(value= {"/signup"}, method=RequestMethod.POST)
-    public ModelAndView createUser(@Valid User user, BindingResult bindingResult) throws GeneralException {
-        ModelAndView model = new ModelAndView();
-        User userExists = userService.findUserByEmail(user.getEmail());
-
-        if(userExists != null) {
-            bindingResult.rejectValue("email", "error.user", USER_EMAIL_ALREADY_EXISTS);
-        }
-        if(bindingResult.hasErrors()) {
-            model.setViewName("user/signup");
-        } else {
-            userService.saveUser(user);
-            model.addObject("msg", "User has been registered successfully!");
-            model.addObject("user", new User());
-            model.setViewName("user/signup");
-        }
-
-        return model;
-    }
-
-    @RequestMapping(value= {"/home/home"}, method=RequestMethod.GET)
-    public ModelAndView home() throws GeneralException {
-        ModelAndView model = new ModelAndView();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(auth.getName());
-
-        model.addObject("userName", user.getFirstName() + " " + user.getLastName());
-        model.setViewName("home/home");
-        return model;
-    }
-
-    @RequestMapping(value= {"/access_denied"}, method=RequestMethod.GET)
-    public ModelAndView accessDenied() {
-        ModelAndView model = new ModelAndView();
-        model.setViewName("errors/access_denied");
-        return model;
-    }
 }

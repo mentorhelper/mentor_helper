@@ -25,6 +25,8 @@ public interface UserDetailsMapper{
     }
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "enabled", source = "enabled")
+    @Mapping(target = "locked", source = "locked")
     @Mapping(target = "username", source = "username")
     @Mapping(target = "password", source = "password")
     @Mapping(target = "authorities", expression = "java(com.ua.javarush.mentor.mapper.UserDetailsMapper.getAuthoritiesSetForRole(user.getRoleId()))")
