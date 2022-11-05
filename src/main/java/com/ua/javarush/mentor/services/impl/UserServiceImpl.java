@@ -223,6 +223,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public void sendConfirmationEmail(String email) throws GeneralException {
         User user = findUserByEmail(email);
         emailService.sendConfirmationEmail(createSendEmailCommand(user, AppLocale.EN));
