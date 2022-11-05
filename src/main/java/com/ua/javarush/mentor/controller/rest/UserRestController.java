@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.controller;
+package com.ua.javarush.mentor.controller.rest;
 
 import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
@@ -15,22 +15,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 
 import java.security.Principal;
 
-
 @RestController
-@RequestMapping("/user")
+@RequestMapping("api/user")
 @Tag(name = "User", description = "Role API")
-public class UserController {
+public class UserRestController {
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    @Autowired
+    public UserRestController(UserService userService) {
         this.userService = userService;
     }
 
@@ -197,10 +199,10 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorDTO.class)
                             ))},
             tags = "User")
-    public ResponseEntity<Void> confirmEmail(@PathVariable("token") String token,
-                                             @PathVariable("email") String email) throws GeneralException {
+    public ModelAndView confirmEmail(@PathVariable("token") String token,
+                                     @PathVariable("email") String email) throws GeneralException {
         userService.confirmEmail(token, email);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ModelAndView("redirect:/login");
     }
 
     @GetMapping("/password/reset/{email}")
@@ -268,4 +270,5 @@ public class UserController {
         userService.exportToPDF(response, appLocale);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }

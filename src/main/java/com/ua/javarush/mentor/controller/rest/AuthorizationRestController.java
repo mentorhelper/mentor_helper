@@ -1,4 +1,4 @@
-package com.ua.javarush.mentor.controller;
+package com.ua.javarush.mentor.controller.rest;
 
 import com.ua.javarush.mentor.command.LoginCommand;
 import com.ua.javarush.mentor.dto.UserDTO;
@@ -21,13 +21,13 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 @Tag(name = "Authorization", description = "Auth API")
-public class AuthorizationController {
+public class AuthorizationRestController {
 
     private final AuthorizationService authorizationService;
 
-    public AuthorizationController(AuthorizationService authorizationService) {
+    public AuthorizationRestController(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
     }
 

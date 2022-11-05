@@ -25,4 +25,6 @@ public interface RoleService {
     void removePermissionInRole(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException;
 
     Role fetchRole(Long roleId) throws GeneralException;
+
+    Role findByRole(String role) throws GeneralException;
 }

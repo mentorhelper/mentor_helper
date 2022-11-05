@@ -46,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
 
     public RoleServiceImpl(RoleRepository roleRepository,
                            RoleToPermissionRepository roleToPermissionRepository,
-                           RoleMapper roleMapper,
+                          RoleMapper roleMapper,
                            RoleToPermissionMapper roleToPermissionMapper) {
         this.roleRepository = roleRepository;
         this.roleToPermissionRepository = roleToPermissionRepository;
@@ -123,6 +123,15 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findById(roleId)
                 .orElseThrow(() -> createGeneralException(NOT_FOUND_ROLE_ERROR, HttpStatus.NOT_FOUND, UiError.ROLE_NOT_FOUND));
     }
+
+    @Override
+    public Role findByRole(String role) throws GeneralException {
+        return roleRepository.findByName(role)
+                .orElseThrow(() -> createGeneralException(NOT_FOUND_ROLE_ERROR, HttpStatus.NOT_FOUND, UiError.ROLE_NOT_FOUND));
+
+    }
+
+
 
     @NotNull
     private RoleToPermission fetchPermissionByRoleId(Long roleId, RoleToPermissionCommand roleToPermissionCommand) throws GeneralException {

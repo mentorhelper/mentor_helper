@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -26,13 +27,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig {
 
-    private static final String AUTH_ENDPOINTS = "/auth/**";
-    private static final String REGISTER_ENDPOINTS = "/user/create";
-    public static final String EMAIL_ENDPOINTS = "/user/email/confirm/**";
-    public static final String RESET_PASSWORD_ENDPOINTS = "/user/password/reset/**";
+    public static final String WEB_LOGOUT = "/logout";
+    private static final String API_AUTH_ENDPOINTS = "/api/auth/**";
+    private static final String API_REGISTER_ENDPOINTS = "/api/user/create";
+    public static final String API_EMAIL_ENDPOINTS = "/api/user/email/confirm/**/**";
+    public static final String API_RESET_PASSWORD_ENDPOINTS = "/api/user/password/reset/**";
+    public static final String WEB_SIGN_UP_ENDPOINTS = "/sign-up";
+    public static final String WEB_EMPTY = "/";
+    public static final String WEB_LOGIN = "/login";
+    public static final String WEB_HOME = "/home";
+
     private static final String[] OPEN_API_ENDPOINTS = {
             "/v3/api-docs/**",
             "/swagger-ui/**"};
+    public static final String ERROR_TRUE = "?error=true";
 
     private final UserServiceImpl userDetailsService;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
@@ -59,21 +67,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                .antMatchers("/dashboard/**", "/actuator/**", "/login").permitAll()
-                .antMatchers(AUTH_ENDPOINTS).permitAll()
-                .antMatchers(REGISTER_ENDPOINTS).permitAll()
-                .antMatchers(OPEN_API_ENDPOINTS).permitAll()
-                .antMatchers(EMAIL_ENDPOINTS).permitAll()
-                .antMatchers(RESET_PASSWORD_ENDPOINTS).permitAll()
-                .anyRequest().authenticated()
+                .formLogin()
+                    .loginPage(WEB_LOGIN)
+                    .failureUrl(WEB_LOGIN + ERROR_TRUE)
+                    .defaultSuccessUrl(WEB_HOME)
+                    .usernameParameter("username")
+                    .passwordParameter("password")
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+                    .logout()
+                    .logoutRequestMatcher(new AntPathRequestMatcher(WEB_LOGOUT))
+                    .logoutSuccessUrl(WEB_EMPTY)
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+                    .rememberMe()
+                .and()
+                    .authorizeRequests()
+                    .antMatchers("/dashboard/**", "/actuator/**").permitAll()
+                    .antMatchers(WEB_EMPTY, "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                    .antMatchers(API_AUTH_ENDPOINTS, API_REGISTER_ENDPOINTS, API_EMAIL_ENDPOINTS, API_RESET_PASSWORD_ENDPOINTS).permitAll()
+                    .antMatchers(WEB_SIGN_UP_ENDPOINTS, WEB_LOGIN).permitAll()
+                    .antMatchers(OPEN_API_ENDPOINTS).permitAll()
+                    .anyRequest().authenticated()
+                .and()
+                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                    .exceptionHandling()
+                    .authenticationEntryPoint(unauthorizedHandler)
+                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .exceptionHandling()
+                    .accessDeniedPage("/access_denied")
+                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
     }
 }
