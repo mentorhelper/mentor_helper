@@ -1,6 +1,7 @@
 package com.ua.javarush.mentor.services;
 
 import com.ua.javarush.mentor.command.*;
+import com.ua.javarush.mentor.dto.FileDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.AppLocale;
@@ -48,4 +49,6 @@ public interface UserService {
     void exportToPDF(HttpServletResponse response, AppLocale appLocale) throws GeneralException;
 
     boolean isEmailExists(String email);
+
+    FileDTO uploadFile(FileCommand fileCommand, Principal principal) throws GeneralException;
 }

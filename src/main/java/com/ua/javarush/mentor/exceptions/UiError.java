@@ -31,7 +31,12 @@ public enum UiError {
     USERNAME_ALREADY_EXISTS(UiErrorCode.USERNAME_ALREADY_EXISTS, "Username already exists"),
     MAX_COUNT_OF_RESET_PASSWORD_REACHED(UiErrorCode.MAX_COUNT_OF_RESET_PASSWORD_REACHED, "Max count of reset password reached"),
     OLD_PASSWORD_NOT_VALID(UiErrorCode.OLD_PASSWORD_NOT_VALID, "Old password not valid"),
-    APPLICATION_ERROR(UiErrorCode.APPLICATION_ERROR, "Application error");
+    APPLICATION_ERROR(UiErrorCode.APPLICATION_ERROR, "Application error"),
+    FILE_NOT_FOUND(UiErrorCode.FILE_NOT_FOUND, "File not found"),
+    UNABLE_TO_GET_FILE_FROM_S3(UiErrorCode.UNABLE_TO_GET_FILE_FROM_S3, "Unable to get file from S3"),
+    FILE_TYPE_NOT_DETERMINE(UiErrorCode.FILE_TYPE_NOT_DETERMINE, "File type not determine"),
+    FILE_TYPE_NOT_SUPPORTED(UiErrorCode.FILE_TYPE_NOT_SUPPORTED, "File type not supported"),
+    FILE_UPLOAD_ERROR(UiErrorCode.FILE_UPLOAD_ERROR, "File upload error");
 
     private final String code;
     private final String message;

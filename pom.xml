@@ -116,6 +116,12 @@
             <artifactId>slack-api-client</artifactId>
             <version>1.25.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.12.336</version>
+        </dependency>
+
 
         <!-- additional libraries -->
         <dependency>
