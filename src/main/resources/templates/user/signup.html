@@ -2,6 +2,16 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/templates/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/templates/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="194x194" href="/templates/favicons/favicon-194x194.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/templates/favicons/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/templates/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/templates/favicons/site.webmanifest">
+    <link rel="mask-icon" href="/templates/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
     <title>Sign up</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"
           id="bootstrap-css">
@@ -19,13 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <h2>Register New User</h2>
-                <hr>
-            </div>
-        </div>
+        <h1 class="text-center">Register new user</h1>
         <div class="row">
             <div class="col-md-3 field-label-responsive">
                 <label for="firstname">Username</label>
@@ -34,8 +38,8 @@
                 <div class="form-group">
                     <div class="input-group mb-2 mr-sm-2 mb-sm-0">
                         <div class="input-group-addon" style="width: 2.6rem"><i class="fa fa-user"></i></div>
-                        <input type="text" th:field="*{username}" class="form-control" id="username"
-                               name="username" placeholder="Username" required autofocus>
+                        <label for="username"></label><input type="text" th:field="*{username}" class="form-control" id="username"
+                                                             name="username" placeholder="Username" required autofocus>
                     </div>
                 </div>
             </div>
@@ -129,10 +133,9 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <button type="submit" class="btn btn-success"><i class="fa fa-user-plus"></i> Register</button>
+        <div class="container">
+            <div class="d-flex justify-content-center align-items-center vh-100">
+                <button class="btn btn-success">Register</button>
             </div>
         </div>
     </form>
