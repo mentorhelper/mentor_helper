@@ -7,44 +7,44 @@ dataBaseChangeLog:
             catalogName:
             columns:
               - column:
-                  name:
+                  name: permission
                   value: createNewRole
               - column:
-                  name:
+                  name: permission
                   value: deleteRole
               - column:
-                  name:
+                  name: permission
                   value: createNewMentor
               - column:
-                  name:
+                  name: permission
                   value: deleteMentor
               - column:
-                  name:
+                  name: permission
                   value: updateMentor
               - column:
-                  name:
+                  name: permission
                   value: createModule
               - column:
-                  name:
+                  name: permission
                   value: createLecture
               - column:
-                  name:
+                  name: permission
                   value: updateModule
               - column:
-                  name:
+                  name: permission
                   value: updateLecture
               - column:
-                  name:
+                  name: permission
                   value: createNewAccountant
               - column:
-                  name:
+                  name: permission
                   value: deleteAccountant
               - column:
-                  name:
+                  name: permission
                   value: generateReport
           dbms:
             schemaName:
-            tableName: Admin
+            tableName: roleToPermission
 
   - changeSet:
       id: 2
@@ -54,8 +54,8 @@ dataBaseChangeLog:
           catalogName:
           columns:
             - column:
-                name:
+                name: permission
                 value: generateReport
               dbms:
               schemaName:
-              tableName: Accountant
+              tableName: roleToPermission
