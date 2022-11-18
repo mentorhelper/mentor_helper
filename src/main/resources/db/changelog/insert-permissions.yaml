@@ -1,0 +1,61 @@
+dataBaseChangeLog:
+  - changeSet:
+      id: 1
+      author: danir
+      changes:
+        - insert:
+            catalogName:
+            columns:
+              - column:
+                  name:
+                  value: createNewRole
+              - column:
+                  name:
+                  value: deleteRole
+              - column:
+                  name:
+                  value: createNewMentor
+              - column:
+                  name:
+                  value: deleteMentor
+              - column:
+                  name:
+                  value: updateMentor
+              - column:
+                  name:
+                  value: createModule
+              - column:
+                  name:
+                  value: createLecture
+              - column:
+                  name:
+                  value: updateModule
+              - column:
+                  name:
+                  value: updateLecture
+              - column:
+                  name:
+                  value: createNewAccountant
+              - column:
+                  name:
+                  value: deleteAccountant
+              - column:
+                  name:
+                  value: generateReport
+          dbms:
+            schemaName:
+            tableName: Admin
+
+  - changeSet:
+      id: 2
+      author: danir
+      changes:
+      - insert:
+          catalogName:
+          columns:
+            - column:
+                name:
+                value: generateReport
+              dbms:
+              schemaName:
+              tableName: Accountant
