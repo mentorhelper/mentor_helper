@@ -32,4 +32,9 @@ public class UiErrorCode {
     public static final String CODE_NOT_VALID = "21";
     public static final String CODE_EXPIRED = "22";
     public static final String PDF_EXPORT_ERROR = "23";
+    public static final String FILE_NOT_FOUND = "24";
+    public static final String UNABLE_TO_GET_FILE_FROM_S3 = "25";
+    public static final String FILE_TYPE_NOT_DETERMINE = "26";
+    public static final String FILE_TYPE_NOT_SUPPORTED = "27";
+    public static final String FILE_UPLOAD_ERROR = "28";
 }

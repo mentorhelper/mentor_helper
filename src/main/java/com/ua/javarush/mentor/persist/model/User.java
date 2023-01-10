@@ -117,6 +117,12 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastPasswordChange;
 
+    @Column(name = "AVATAR_KEY")
+    private String avatarKey;
+
+    @Column(name = "WALLPAPER_KEY")
+    private String wallpaperKey;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

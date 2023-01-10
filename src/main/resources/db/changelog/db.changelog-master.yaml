@@ -912,6 +912,25 @@ databaseChangeLog:
                   name: locked
                   type: boolean
                   remarks: "Is locked"
+  - changeSet:
+      id: 24
+      author: antonKupreychik
+      changes:
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: avatar_key
+                  type: varchar(255)
+                  remarks: "Avatar key"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: wallpaper_key
+                  type: varchar(255)
+                  remarks: "Wallpaper key"
+                  constraints:
+                    nullable: true
 
 
 

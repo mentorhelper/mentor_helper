@@ -2,9 +2,10 @@ package com.ua.javarush.mentor.controller.rest;
 
 import com.ua.javarush.mentor.command.*;
 import com.ua.javarush.mentor.dto.ErrorDTO;
+import com.ua.javarush.mentor.dto.FileDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
-import com.ua.javarush.mentor.enums.AppLocale;
+import com.ua.javarush.mentor.enums.UploadingType;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletResponse;
 
 import java.security.Principal;
 
@@ -254,21 +254,23 @@ public class UserRestController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/export/pdf")
-    @Operation(
-            summary = "Generate pdf",
-            description = "Generate pdf about all users. Available languages: EN, RU",
+    @PutMapping("/avatar/upload")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Upload avatar",
+            description = "Upload avatar",
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK"),
                     @ApiResponse(responseCode = "400", description = "Bad request",
                             content = @Content(
                                     schema = @Schema(implementation = ErrorDTO.class)
-                            ))}
-    )
-    public ResponseEntity<Void> exportToPDF(HttpServletResponse response,
-                                            AppLocale appLocale) throws GeneralException {
-        userService.exportToPDF(response, appLocale);
-        return new ResponseEntity<>(HttpStatus.OK);
+                            ))},
+            tags = "User")
+    public ResponseEntity<FileDTO> uploadAvatar(@Parameter(content = @Content(mediaType = "multipart/form-data")) @RequestParam("file") MultipartFile file, Principal principal) throws GeneralException {
+        FileCommand fileCommand = FileCommand.builder()
+                .files(new MultipartFile[]{file})
+                .uploadingType(UploadingType.AVATAR)
+                .build();
+        FileDTO fileDTO = userService.uploadFile(fileCommand, principal);
+        return new ResponseEntity<>(fileDTO, HttpStatus.OK);
     }
-
 }

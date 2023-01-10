@@ -1,9 +1,11 @@
 package com.ua.javarush.mentor.services.impl;
 
 import com.ua.javarush.mentor.command.*;
+import com.ua.javarush.mentor.dto.FileDTO;
 import com.ua.javarush.mentor.dto.PageDTO;
 import com.ua.javarush.mentor.dto.UserDTO;
 import com.ua.javarush.mentor.enums.AppLocale;
+import com.ua.javarush.mentor.enums.UploadingType;
 import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.enums.Configs;
 import com.ua.javarush.mentor.enums.EmailTemplates;
@@ -90,8 +92,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserPDFExporter userPDFExporter;
     private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final S3Service s3Service;
 
-    public UserServiceImpl(UserRepository userRepository, ConfigRepository configRepository, UserMapper userMapper, UserDetailsMapper userDetailsMapper, UserPDFExporter userPDFExporter, RoleService roleService, ValidationService validationService, TelegramService telegramService, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           ConfigRepository configRepository,
+                           UserMapper userMapper,
+                           UserDetailsMapper userDetailsMapper,
+                           UserPDFExporter userPDFExporter,
+                           RoleService roleService,
+                           ValidationService validationService,
+                           TelegramService telegramService,
+                           EmailService emailService,
+                           BCryptPasswordEncoder bCryptPasswordEncoder,
+                           S3Service s3Service) {
         this.userRepository = userRepository;
         this.configRepository = configRepository;
         this.userMapper = userMapper;
@@ -102,6 +115,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.userPDFExporter = userPDFExporter;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -313,6 +327,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             throw createGeneralException(CODE_IS_NOT_VALID, HttpStatus.BAD_REQUEST, UiError.CODE_NOT_VALID);
         }
+    }
+
+    @Override
+    public FileDTO uploadFile(FileCommand fileCommand, Principal principal) throws GeneralException {
+        UploadingType uploadingType = fileCommand.getUploadingType();
+        User user = getUserByPrincipal(principal);
+        FileDTO fileDTO = new FileDTO();
+        if (uploadingType.equals(UploadingType.AVATAR)) {
+            fileDTO = uploadAvatar(fileCommand, user);
+        }
+        return fileDTO;
+    }
+
+    private FileDTO uploadAvatar(FileCommand fileCommand, User user) throws GeneralException {
+        if (user.getAvatarKey() != null) {
+            s3Service.deleteFile(user.getAvatarKey());
+        }
+        FileDTO fileDTO = s3Service.uploadFile(fileCommand.getFiles()[0]);
+        user.setAvatarKey(fileDTO.getName());
+        userRepository.save(user);
+        return fileDTO;
     }
 
     private User getUserByPrincipal(Principal principal) throws GeneralException {
