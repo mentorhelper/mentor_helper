@@ -1,0 +1,61 @@
+dataBaseChangeLog:
+  - changeSet:
+      id: 1
+      author: danir
+      changes:
+        - insert:
+            catalogName:
+            columns:
+              - column:
+                  name: permission
+                  value: createNewRole
+              - column:
+                  name: permission
+                  value: deleteRole
+              - column:
+                  name: permission
+                  value: createNewMentor
+              - column:
+                  name: permission
+                  value: deleteMentor
+              - column:
+                  name: permission
+                  value: updateMentor
+              - column:
+                  name: permission
+                  value: createModule
+              - column:
+                  name: permission
+                  value: createLecture
+              - column:
+                  name: permission
+                  value: updateModule
+              - column:
+                  name: permission
+                  value: updateLecture
+              - column:
+                  name: permission
+                  value: createNewAccountant
+              - column:
+                  name: permission
+                  value: deleteAccountant
+              - column:
+                  name: permission
+                  value: generateReport
+          dbms:
+            schemaName:
+            tableName: roleToPermission
+
+  - changeSet:
+      id: 2
+      author: danir
+      changes:
+      - insert:
+          catalogName:
+          columns:
+            - column:
+                name: permission
+                value: generateReport
+              dbms:
+              schemaName:
+              tableName: roleToPermission
