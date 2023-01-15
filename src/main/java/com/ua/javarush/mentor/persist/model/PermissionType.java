@@ -3,5 +3,18 @@ package com.ua.javarush.mentor.persist.model;
 public enum PermissionType {
     CREATING_USERS,
     ADD,
-    REMOVE
+    REMOVE,
+    CREATE_NEW_ROLE,
+    DELETE_ROLE,
+    UPDATE_ROLE_PERMISSION,
+    CREATE_NEW_MENTOR,
+    DELETE_MENTOR,
+    UPDATE_MENTOR,
+    CREATE_MODULE,
+    CREATE_LECTURE,
+    UPDATE_MODULE,
+    UPDATE_LECTURE,
+    CREATE_NEW_ACCOUNTANT,
+    DELETE_ACCOUNTANT,
+    GENERATE_REPORT
 }
