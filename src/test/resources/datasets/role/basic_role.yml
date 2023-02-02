@@ -1,0 +1,11 @@
+role:
+  - id: 1
+    name: 'ROLE_USER'
+  - id: 2
+    name: 'ROLE_ADMIN'
+  - id: 3
+    name: 'ROLE_MODERATOR'
+  - id: 4
+    name: 'ROLE_SUPER_ADMIN'
+  - id: 5
+    name: 'ME'
