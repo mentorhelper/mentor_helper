@@ -103,8 +103,8 @@
         <!-- integrations -->
         <dependency>
             <groupId>org.telegram</groupId>
-            <artifactId>telegrambots</artifactId>
-            <version>6.1.0</version>
+            <artifactId>telegrambots-spring-boot-starter</artifactId>
+            <version>6.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
