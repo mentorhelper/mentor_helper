@@ -1,6 +1,6 @@
 package com.ua.javarush.mentor.services.impl;
 
-import com.ua.javarush.mentor.bot.MentorHelperBot;
+import com.ua.javarush.mentor.bot.Keyboard;
 import com.ua.javarush.mentor.exceptions.UiError;
 import com.ua.javarush.mentor.exceptions.GeneralException;
 import com.ua.javarush.mentor.services.TelegramService;
@@ -15,16 +15,16 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Service
 public class TelegramServiceImpl implements TelegramService {
 
-    private final MentorHelperBot mentorHelperBot;
+    private final Keyboard keyboard;
 
-    public TelegramServiceImpl(MentorHelperBot mentorHelperBot) {
-        this.mentorHelperBot = mentorHelperBot;
+    public TelegramServiceImpl(Keyboard keyboard) {
+        this.keyboard = keyboard;
     }
 
     @Override
-    public void sendMessage(Long userId, String message) throws GeneralException {
+    public SendMessage sendMessage(Long userId, String message) throws GeneralException {
         try {
-            mentorHelperBot.execute(buildMessage(userId, message));
+            return buildMessage(userId, message);
         } catch (Exception e) {
             log.error("Error while sending message to user with id {}", userId, e);
             throw createGeneralException("Cannot send message to user with id " + userId, BAD_REQUEST, UiError.TELEGRAM_SEND_MESSAGE_ERROR, e);
@@ -36,6 +36,9 @@ public class TelegramServiceImpl implements TelegramService {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(userId);
         sendMessage.setText(message);
+
+        sendMessage.setReplyMarkup(keyboard.getKeyboardMarkup());
+        sendMessage.enableHtml(true);
         return sendMessage;
     }
 }
